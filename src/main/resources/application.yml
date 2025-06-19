@@ -1,0 +1,105 @@
+spring:
+  application:
+    name: drone-simulation
+  
+  # 数据库配置
+  datasource:
+    url: jdbc:postgresql://localhost:5432/drone_simulation
+    username: sim_user
+    password: sim_pass
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+  
+  # JPA配置
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+  
+  # Redis配置
+  redis:
+    host: localhost
+    port: 6379
+    database: 0
+    timeout: 10000
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+        max-wait: -1
+  
+  # Kafka配置
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      batch-size: 16384
+      buffer-memory: 33554432
+    consumer:
+      group-id: drone-simulation-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.simulation.drone.entity
+
+# 仿真系统配置
+simulation:
+  clock:
+    time-step: 100  # 时间步长(ms)
+    max-threads: 8  # 最大计算线程数
+  environment:
+    spatial-index-depth: 8  # 空间索引深度
+    cache-ttl: 300  # 缓存TTL(秒)
+  message:
+    serialization:
+      type: msgpack
+      compression: false
+    validation:
+      enabled: true
+    cache:
+      enabled: true
+      size: 1000
+      ttl: 5000
+  
+# AirSim配置
+airsim:
+  host: localhost
+  port: 41451
+  connection:
+    timeout: 5000
+    retry:
+      max-attempts: 3
+      initial-interval: 1000
+      multiplier: 2.0
+      max-interval: 10000
+
+# 服务器配置
+server:
+  port: 8080
+  servlet:
+    context-path: /api/v1
+
+# 监控配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    com.simulation.drone: INFO
+    com.simulation.drone.adapter.airsim: DEBUG 
