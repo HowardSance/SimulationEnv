@@ -65,83 +65,109 @@
 ```
 com.simulation.drone
 ├── config/                     # 配置类
-│   ├── KafkaConfig.java
-│   ├── RedisConfig.java
-│   ├── WebSocketConfig.java
-│   └── SchedulingConfig.java
+│   ├── KafkaConfig.java       # Kafka消息中间件配置
+│   ├── RedisConfig.java       # Redis缓存配置
+│   ├── WebSocketConfig.java   # WebSocket实时通信配置
+│   ├── SwaggerConfig.java     # API文档配置
+│   ├── AirSimConfig.java      # AirSim连接配置
+│   └── EnvironmentConfig.java # 环境参数配置
 ├── controller/                 # 控制器层
-│   ├── SimulationController.java
-│   ├── DeviceController.java
-│   ├── WebSocketController.java
-│   └── ConfigController.java
+│   ├── SimulationController.java  # 仿真控制接口
+│   ├── DeviceController.java      # 设备管理接口
+│   ├── WebSocketController.java   # WebSocket消息处理
+│   └── ConfigController.java      # 配置管理接口
 ├── service/                    # 服务层
-│   ├── SimulationService.java
-│   ├── DeviceManagementService.java
-│   ├── ConfigurationService.java
-│   ├── EventPublishService.java
-│   └── impl/
+│   ├── SimulationService.java     # 仿真逻辑服务
+│   ├── DeviceManagementService.java # 设备管理服务
+│   ├── ConfigurationService.java    # 配置管理服务
+│   ├── EventPublishService.java     # 事件发布服务
+│   └── impl/                        # 服务实现类
+│       ├── SimulationServiceImpl.java
+│       ├── DeviceManagementServiceImpl.java
+│       ├── ConfigurationServiceImpl.java
+│       └── EventPublishServiceImpl.java
 ├── engine/                     # 核心引擎
-│   ├── EnvironmentEngine.java
-│   ├── DetectionEngine.java
-│   ├── MovementEngine.java
-│   ├── SimulationClock.java
-│   └── detector/
-│       ├── RadarDetector.java
-│       ├── OpticalDetector.java
-│       └── RadioDetector.java
+│   ├── EnvironmentEngine.java     # 环境状态管理引擎
+│   ├── DetectionEngine.java       # 探测逻辑处理引擎
+│   ├── MovementEngine.java        # 运动学计算引擎
+│   ├── SimulationEngine.java      # 仿真主引擎
+│   └── impl/                      # 引擎实现类
+│       ├── DetectionEngineImpl.java
+│       └── SimulationEngineImpl.java
 ├── entity/                     # 实体类
-│   ├── simulation/
-│   │   ├── EnvironmentContainer.java
-│   │   ├── DroneEntity.java
-│   │   ├── DetectionDevice.java
-│   │   └── DetectionEvent.java
-│   ├── config/
-│   │   ├── DeviceTemplate.java
-│   │   ├── EnvironmentConfig.java
-│   │   └── TargetCharacteristic.java
-│   └── dto/
+│   ├── simulation/                # 仿真相关实体
+│   │   ├── DroneEntity.java         # 无人机实体
+│   │   ├── DetectionDevice.java     # 探测设备实体
+│   │   └── DetectionEvent.java      # 探测事件实体
+│   ├── config/                    # 配置相关实体
+│   │   ├── DeviceTemplate.java      # 设备模板配置
+│   │   ├── EnvironmentConfig.java   # 环境配置
+│   │   └── TargetCharacteristic.java # 目标特征配置
+│   └── dto/                       # 数据传输对象
+│       ├── core/
+│       │   └── SimulationCoreDTO.java  # 仿真核心数据
+│       ├── detection/
+│       │   └── DetectionResultDTO.java # 探测结果数据
+│       ├── device/
+│       │   └── DeviceStateDTO.java     # 设备状态数据
+│       ├── event/
+│       │   └── DetectionEventDTO.java  # 探测事件数据
+│       └── metrics/
+│           └── PerformanceMetricsDTO.java # 性能指标数据
 ├── adapter/                    # 外部系统适配
-│   ├── airsim/
-│   │   ├── api/                    # 已实现：API接口定义
-│   │   │   ├── RpcLibClientBase.java      # RPC客户端基础接口
+│   ├── airsim/                    # AirSim适配器
+│   │   ├── api/                      # API接口定义
+│   │   │   ├── RpcLibClientBase.java      # RPC基础客户端接口
 │   │   │   ├── CarClientInterface.java    # 车辆控制接口
-│   │   │   └── AirSimRpcMessageTrait.java # RPC消息序列化工具
-│   │   ├── messages/               # 已实现：消息定义
+│   │   │   └── AirSimRpcMessageTrait.java # RPC消息序列化特征
+│   │   ├── messages/                 # 消息定义(完整的AirSim消息类型)
 │   │   │   ├── Vector3r.java           # 3D向量数据结构
 │   │   │   ├── Quaternionr.java        # 四元数数据结构
 │   │   │   ├── Pose.java              # 位姿数据结构
-│   │   │   ├── LidarData.java         # 激光雷达数据
 │   │   │   ├── KinematicsState.java   # 运动学状态
+│   │   │   ├── LidarData.java         # 激光雷达数据
 │   │   │   ├── ImuData.java           # IMU传感器数据
 │   │   │   ├── DistanceSensorData.java # 距离传感器数据
 │   │   │   ├── CarState.java          # 车辆状态数据
-│   │   │   └── CarControls.java       # 车辆控制指令
-│   │   ├── DroneClientInterface.java   # 新增：无人机控制接口
-│   │   ├── AirSimAdapter.java         # 适配器实现类
-│   │   └── AirSimConnectionManager.java # 连接管理器
-│   ├── kafka/
-│   │   ├── EventProducer.java
-│   │   └── ConfigConsumer.java
-│   └── config/
-│       └── ConfigCenterAdapter.java
+│   │   │   ├── CarControls.java       # 车辆控制指令
+│   │   │   ├── MultirotorState.java   # 多旋翼无人机状态
+│   │   │   ├── CollisionInfo.java     # 碰撞信息
+│   │   │   ├── GeoPoint.java          # 地理位置点
+│   │   │   ├── RCData.java            # 遥控器数据
+│   │   │   ├── GpsData.java           # GPS传感器数据
+│   │   │   ├── BarometerData.java     # 气压计数据
+│   │   │   ├── MagnetometerData.java  # 磁力计数据
+│   │   │   ├── ImageRequest.java      # 图像请求
+│   │   │   ├── ImageResponse.java     # 图像响应
+│   │   │   └── YawMode.java           # 偏航控制模式
+│   │   ├── DroneClientInterface.java   # 无人机客户端接口
+│   │   ├── AirSimAdapter.java         # 适配器接口定义
+│   │   ├── impl/                     # 适配器实现
+│   │   │   └── AirSimAdapterImpl.java  # AirSim适配器实现
+│   │   └── example/                  # 使用示例
+│   │       └── DroneSimulationExample.java # 无人机仿真示例
+│   └── kafka/                     # Kafka适配器
+│       ├── EventProducer.java       # 事件生产者
+│       └── ConfigConsumer.java      # 配置消费者
 ├── algorithm/                  # 算法实现
-│   ├── detection/
-│   │   ├── RadarAlgorithm.java
-│   │   ├── OpticalAlgorithm.java
-│   │   └── RadioAlgorithm.java
-│   ├── movement/
-│   │   └── KinematicsCalculator.java
-│   └── coordinate/
-│       └── CoordinateTransform.java
+│   ├── detection/                # 探测算法
+│   │   ├── RadarAlgorithm.java     # 雷达探测算法
+│   │   ├── OpticalAlgorithm.java   # 光电探测算法
+│   │   └── RadioAlgorithm.java     # 无线电探测算法
+│   └── movement/                 # 运动算法
+│       └── KinematicsCalculator.java # 运动学计算器
 ├── repository/                 # 数据访问层
-│   ├── DeviceRepository.java
-│   ├── ConfigRepository.java
-│   └── EventRepository.java
+│   ├── DeviceRepository.java      # 设备数据访问
+│   ├── DroneRepository.java       # 无人机数据访问
+│   ├── EventRepository.java       # 事件数据访问
+│   ├── DeviceTemplateRepository.java # 设备模板数据访问
+│   ├── EnvironmentConfigRepository.java # 环境配置数据访问
+│   └── TargetCharacteristicRepository.java # 目标特征数据访问
 ├── util/                      # 工具类
-│   ├── GeometryUtils.java
-│   ├── MathUtils.java
-│   └── ValidationUtils.java
-└── DroneSimulationApplication.java
+│   ├── GeometryUtils.java       # 几何计算工具
+│   ├── MathUtils.java          # 数学计算工具
+│   └── ValidationUtils.java    # 数据验证工具
+└── DroneSimulationApplication.java # 应用程序入口
 ```
 
 ## 3. 核心模块功能拆解
@@ -207,19 +233,79 @@ com.simulation.drone
 
 ### 3.4 AirSim集成模块 (AirSim Integration)
 
-**核心职责**: 与UE+AirSim仿真引擎的双向通信
+**核心职责**: 与UE+AirSim仿真引擎的双向通信，基于msgpack-rpc协议实现
 
 **主要组件**:
+- `DroneClientInterface`: 无人机客户端接口，继承RpcLibClientBase
 - `AirSimAdapter`: AirSim API封装适配器
+- `AirSimAdapterImpl`: 适配器具体实现
 - `MessagePackClient`: msgpack-rpc协议客户端
-- `SensorDataProcessor`: 传感器数据预处理
-- `SceneRenderer`: 3D场景渲染控制
+- 完整的消息类型系统(messages包)
+
+**API接口体系**:
+```java
+// 基础RPC接口
+RpcLibClientBase {
+    confirmConnection(), reset(), ping()
+    simIsPaused(), simPause(), simContinueForTime()
+    simGetVehiclePose(), simSetVehiclePose()
+    getLidarData(), getImuData(), getDistanceSensorData()
+}
+
+// 无人机专用接口
+DroneClientInterface extends RpcLibClientBase {
+    // 控制相关
+    enableApiControl(), armDisarm(), takeoffAsync(), landAsync()
+    moveToPositionAsync(), moveByVelocityAsync(), rotateToYawAsync()
+    
+    // 状态获取
+    getMultirotorState(), getPosition(), getVelocity(), getOrientation()
+    getGpsData(), getBarometerData(), getMagnetometerData()
+    
+    // 图像相关
+    simGetImages(), getImage()
+    
+    // 碰撞检测
+    simGetCollisionInfo()
+}
+```
 
 **集成功能**:
-- 无人机状态同步(位置、姿态、速度)
-- 传感器数据获取(相机图像、激光雷达点云)
-- 环境渲染控制(天气、光照、地形)
-- 场景动态加载与卸载
+- **无人机控制**: 启动/关闭、起飞/降落、精确位置控制、速度控制、姿态控制
+- **状态监控**: 实时位置、速度、姿态、运动学状态、碰撞检测
+- **传感器数据**: IMU、GPS、气压计、磁力计、距离传感器、激光雷达
+- **图像获取**: 多相机、多类型图像(场景、深度、分割等)
+- **环境交互**: 仿真控制、对象操作、天气设置
+
+**消息类型系统**:
+- **状态类**: `MultirotorState`, `KinematicsState`, `CollisionInfo`
+- **传感器类**: `GpsData`, `ImuData`, `BarometerData`, `MagnetometerData`
+- **图像类**: `ImageRequest`, `ImageResponse`
+- **几何类**: `Vector3r`, `Quaternionr`, `Pose`, `GeoPoint`
+- **控制类**: `YawMode`, `CarControls`, `RCData`
+
+**使用示例**:
+```java
+// 连接初始化
+EventLoop loop = EventLoop.defaultEventLoop();
+Client client = new Client("127.0.0.1", 41451, loop);
+DroneClientInterface droneClient = client.proxy(DroneClientInterface.class);
+
+// 基本控制流程
+droneClient.confirmConnection();
+droneClient.enableApiControl(true, "");
+droneClient.armDisarm(true, "");
+droneClient.takeoffAsync(10.0f, "");
+
+// 运动控制
+YawMode yawMode = YawMode.createYawMode(0);
+droneClient.moveToPositionAsync(10, 0, -10, 5.0f, 30.0f, 0, yawMode, "");
+
+// 获取状态和传感器数据
+MultirotorState state = droneClient.getMultirotorState("");
+GpsData gps = droneClient.getGpsData("gps", "");
+ImageResponse[] images = droneClient.simGetImages(requests, "");
+```
 
 ### 3.5 消息总线模块 (Message Bus Module)
 
@@ -265,7 +351,7 @@ devices:
   radar:
     type: "ELECTROMAGNETIC_RADAR"
     parameters:
-      transmitPower: 
+      transmitPower:
         min: 100
         max: 10000
         default: 1000
@@ -325,6 +411,8 @@ environment:
 | **序列化** | Jackson + MessagePack | - | JSON + 高效二进制序列化 |
 | **数学计算** | Apache Commons Math | 3.6.x | 科学计算与统计分析 |
 | **空间计算** | JTS Topology Suite | 1.19.x | 几何计算与空间分析 |
+| **RPC通信** | msgpack-rpc | 0.7.x | 与AirSim的高效二进制通信 |
+| **消息序列化** | MessagePack | 0.9.x | 高性能序列化协议 |
 | **配置管理** | Spring Cloud Config | 3.1.x | 分布式配置管理 |
 | **监控** | Micrometer + Prometheus | - | 应用性能监控 |
 
@@ -345,13 +433,13 @@ environment:
 
 ### 4.3 外部系统集成
 
-| 系统 | 协议/接口 | 用途 |
-|------|-----------|------|
-| **Unreal Engine + AirSim** | msgpack-rpc over TCP | 3D仿真引擎集成 |
-| **配置中心** | REST API + WebHook | 配置管理与热更新 |
-| **监控告警** | Prometheus + Grafana | 系统监控与告警 |
-| **日志收集** | ELK Stack | 日志聚合与分析 |
-| **服务发现** | Consul | 微服务注册与发现 |
+| 系统 | 协议/接口 | 用途 | 实现状态 |
+|------|-----------|------|----------|
+| **Unreal Engine + AirSim** | msgpack-rpc over TCP | 3D仿真引擎集成 | ✅ 已完成 |
+| **配置中心** | REST API + WebHook | 配置管理与热更新 | 🚧 进行中 |
+| **监控告警** | Prometheus + Grafana | 系统监控与告警 | 📋 计划中 |
+| **日志收集** | ELK Stack | 日志聚合与分析 | 📋 计划中 |
+| **服务发现** | Consul | 微服务注册与发现 | 📋 计划中 |
 
 ### 4.4 部署架构
 
@@ -592,13 +680,137 @@ main() {
 main "$@"
 ```
 
-## 9. 项目路线图
+## 9. AirSim适配器重构说明
 
-### Phase 1: 核心框架搭建
+### 9.1 重构背景
+
+原有的AirSim适配器设计存在以下问题：
+- 接口定义不完整，缺少关键的无人机控制功能
+- 消息类型不规范，使用通用Map而非强类型
+- 与AirSim官方API规范不一致
+- 缺少完整的传感器数据支持
+
+### 9.2 重构目标
+
+基于AirSim官方提供的Java客户端示例，重构整个适配器模块：
+1. **标准化API接口**：完全遵循AirSim官方API规范
+2. **完整消息系统**：实现所有必要的消息类型
+3. **类型安全**：使用强类型替代Map传参
+4. **功能完整**：支持无人机的全部控制和传感器功能
+
+### 9.3 核心改进
+
+#### 接口设计
+```java
+// 新的接口继承体系
+DroneClientInterface extends RpcLibClientBase {
+    // 基础控制
+    void enableApiControl(boolean isEnabled, String vehicleName);
+    boolean armDisarm(boolean arm, String vehicleName);
+    
+    // 飞行控制
+    boolean takeoffAsync(float timeout, String vehicleName);
+    boolean landAsync(float timeout, String vehicleName);
+    boolean moveToPositionAsync(float x, float y, float z, float velocity, 
+                               float timeout, int drivetrain, YawMode yawMode, String vehicleName);
+    
+    // 状态获取
+    MultirotorState getMultirotorState(String vehicleName);
+    Vector3r getPosition(String vehicleName);
+    GpsData getGpsData(String gpsName, String vehicleName);
+}
+```
+
+#### 消息类型系统
+- **状态消息**：`MultirotorState`, `CollisionInfo`, `KinematicsState`
+- **传感器消息**：`GpsData`, `ImuData`, `BarometerData`, `MagnetometerData`
+- **图像消息**：`ImageRequest`, `ImageResponse`
+- **几何消息**：`Vector3r`, `Quaternionr`, `Pose`, `GeoPoint`
+- **控制消息**：`YawMode`, `RCData`
+
+#### 适配器实现
+```java
+@Component
+public class AirSimAdapterImpl implements AirSimAdapter {
+    // msgpack-rpc客户端
+    private Client client;
+    private DroneClientInterface droneClient;
+    
+    // 状态缓存
+    private Map<String, MultirotorState> droneStateCache;
+    private Map<String, Boolean> droneControlStatus;
+    
+    // 完整的数据转换方法
+    private DroneState convertToInternalDroneState(...);
+    private Vector3 convertVector3r(Vector3r vector3r);
+}
+```
+
+### 9.4 使用示例
+
+#### 基本控制流程
+```java
+// 连接初始化
+EventLoop loop = EventLoop.defaultEventLoop();
+Client client = new Client("127.0.0.1", 41451, loop);
+DroneClientInterface droneClient = client.proxy(DroneClientInterface.class);
+
+// 控制无人机
+droneClient.confirmConnection();
+droneClient.enableApiControl(true, "");
+droneClient.armDisarm(true, "");
+droneClient.takeoffAsync(10.0f, "");
+
+// 移动控制
+YawMode yawMode = YawMode.createYawMode(0);
+droneClient.moveToPositionAsync(10, 0, -10, 5.0f, 30.0f, 0, yawMode, "");
+```
+
+#### 传感器数据获取
+```java
+// 获取完整状态
+MultirotorState state = droneClient.getMultirotorState("");
+
+// 获取各类传感器数据
+GpsData gps = droneClient.getGpsData("gps", "");
+ImuData imu = droneClient.getImuData("imu", "");
+BarometerData barometer = droneClient.getBarometerData("barometer", "");
+
+// 获取图像
+ImageRequest[] requests = {
+    new ImageRequest("front_center", ImageRequest.SCENE, false, true)
+};
+ImageResponse[] images = droneClient.simGetImages(requests, "");
+```
+
+### 9.5 技术优势
+
+1. **API兼容性**：完全兼容AirSim官方Java API
+2. **类型安全**：编译时类型检查，减少运行时错误
+3. **功能完整**：支持无人机的所有控制和传感器功能
+4. **性能优化**：高效的msgpack序列化和连接复用
+5. **可维护性**：清晰的接口设计和完善的错误处理
+
+### 9.6 文件结构
+
+```
+adapter/airsim/
+├── api/                          # 基础API接口
+├── messages/                     # 完整消息类型系统(20+类)
+├── DroneClientInterface.java     # 核心客户端接口
+├── AirSimAdapter.java           # 适配器接口
+├── impl/AirSimAdapterImpl.java  # 适配器实现
+└── example/                     # 使用示例和测试
+```
+
+## 10. 项目路线图
+
+### Phase 1: 核心框架搭建 ✅
 - [x] Spring Boot项目初始化
 - [x] 数据库设计与建表
 - [x] 基础实体类与Repository层
-- [x] AirSim连接适配器开发
+- [x] AirSim连接适配器开发(基于官方API规范)
+- [x] 完整的AirSim消息类型系统
 - [x] 消息总线Kafka集成
 
 ### Phase 2: 仿真引擎开发

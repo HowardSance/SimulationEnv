@@ -1,6 +1,8 @@
 package com.simulation.drone.engine.impl;
 
 import com.simulation.drone.engine.SimulationEngine;
+import com.simulation.drone.engine.ClockEngine;
+import com.simulation.drone.engine.DetectionOrchestrator;
 import com.simulation.drone.entity.DetectionDevice;
 import com.simulation.drone.entity.Drone;
 import com.simulation.drone.entity.EnvironmentConfig;
@@ -19,9 +21,11 @@ import java.util.concurrent.locks.ReentrantLock;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class SimulationEngineImpl implements SimulationEngine {
+public class SimulationEngineImpl implements SimulationEngine, ClockEngine.ClockUpdateListener {
     
     private final EventPublishService eventPublishService;
+    private final ClockEngine clockEngine;
+    private final DetectionOrchestrator detectionOrchestrator;
     
     private final Map<String, Drone> drones = new ConcurrentHashMap<>();
     private final Map<String, DetectionDevice> devices = new ConcurrentHashMap<>();
@@ -42,13 +46,21 @@ public class SimulationEngineImpl implements SimulationEngine {
     public void initialize(EnvironmentConfig config) {
         this.environmentConfig = config;
         this.scheduler = Executors.newSingleThreadScheduledExecutor();
+        
+        // 注册为时钟更新监听器
+        clockEngine.registerUpdateListener(this);
+        
+        // 注册探测编排器为时钟更新监听器
+        clockEngine.registerUpdateListener(detectionOrchestrator);
+        
         log.info("仿真引擎初始化完成，环境配置：{}", config.getName());
     }
     
     @Override
     public void start() {
         if (running.compareAndSet(false, true)) {
-            scheduler.scheduleAtFixedRate(this::update, 0, timeStep.get(), TimeUnit.MILLISECONDS);
+            // 启动时钟引擎，它会驱动整个仿真系统
+            clockEngine.start();
             log.info("仿真引擎启动");
             eventPublishService.publishSimulationStatus("RUNNING");
         }
@@ -57,6 +69,7 @@ public class SimulationEngineImpl implements SimulationEngine {
     @Override
     public void pause() {
         if (running.get() && paused.compareAndSet(false, true)) {
+            clockEngine.pause();
             log.info("仿真引擎暂停");
             eventPublishService.publishSimulationStatus("PAUSED");
         }
@@ -65,6 +78,7 @@ public class SimulationEngineImpl implements SimulationEngine {
     @Override
     public void resume() {
         if (running.get() && paused.compareAndSet(true, false)) {
+            clockEngine.resume();
             log.info("仿真引擎恢复");
             eventPublishService.publishSimulationStatus("RUNNING");
         }
@@ -73,15 +87,21 @@ public class SimulationEngineImpl implements SimulationEngine {
     @Override
     public void stop() {
         if (running.compareAndSet(true, false)) {
-            scheduler.shutdown();
-            try {
-                if (!scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
+            clockEngine.stop();
+            paused.set(false);
+            
+            if (scheduler != null) {
+                scheduler.shutdown();
+                try {
+                    if (!scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
+                        scheduler.shutdownNow();
+                    }
+                } catch (InterruptedException e) {
                     scheduler.shutdownNow();
+                    Thread.currentThread().interrupt();
                 }
-            } catch (InterruptedException e) {
-                scheduler.shutdownNow();
-                Thread.currentThread().interrupt();
             }
+            
             log.info("仿真引擎停止");
             eventPublishService.publishSimulationStatus("STOPPED");
         }
@@ -105,22 +125,20 @@ public class SimulationEngineImpl implements SimulationEngine {
             throw new IllegalArgumentException("时间步长必须在1-1000毫秒之间");
         }
         this.timeStep.set(timeStep);
-        if (running.get()) {
-            scheduler.shutdown();
-            scheduler = Executors.newSingleThreadScheduledExecutor();
-            scheduler.scheduleAtFixedRate(this::update, 0, timeStep, TimeUnit.MILLISECONDS);
-        }
+        clockEngine.setTimeStep(timeStep);
     }
     
     @Override
     public void addDrone(Drone drone) {
         drones.put(drone.getId(), drone);
+        detectionOrchestrator.addDrone(drone.getId());
         log.info("添加无人机：{}", drone.getId());
     }
     
     @Override
     public void removeDrone(String droneId) {
         drones.remove(droneId);
+        detectionOrchestrator.removeDrone(droneId);
         log.info("移除无人机：{}", droneId);
     }
     
@@ -235,14 +253,25 @@ public class SimulationEngineImpl implements SimulationEngine {
         return metrics;
     }
     
-    private void update() {
+
+    
+    private void updateDrone(Drone drone, long currentTime) {
+        // TODO: 实现无人机状态更新逻辑
+    }
+    
+    private void updateDevice(DetectionDevice device, long currentTime) {
+        // TODO: 实现设备状态更新逻辑
+    }
+    
+    @Override
+    public void onClockUpdate(long currentTime, long deltaTime) {
         if (!running.get() || paused.get()) {
             return;
         }
         
         simulationLock.lock();
         try {
-            long currentTime = simulationTime.addAndGet(timeStep.get());
+            simulationTime.set(currentTime);
             
             // 更新无人机状态
             for (Drone drone : drones.values()) {
@@ -254,8 +283,7 @@ public class SimulationEngineImpl implements SimulationEngine {
                 updateDevice(device, currentTime);
             }
             
-            // 执行探测逻辑
-            performDetection();
+            // 探测逻辑由DetectionOrchestrator处理
             
             // 发布状态更新
             eventPublishService.publishSimulationStatus("RUNNING");
@@ -264,16 +292,8 @@ public class SimulationEngineImpl implements SimulationEngine {
         }
     }
     
-    private void updateDrone(Drone drone, long currentTime) {
-        // TODO: 实现无人机状态更新逻辑
-    }
-    
-    private void updateDevice(DetectionDevice device, long currentTime) {
-        // TODO: 实现设备状态更新逻辑
-    }
-    
     private void performDetection() {
-        // TODO: 实现探测逻辑
+        // 探测逻辑已移到DetectionOrchestrator中
     }
     
     private double calculateFPS() {
