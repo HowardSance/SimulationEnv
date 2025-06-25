@@ -1,6 +1,8 @@
 spring:
   application:
     name: drone-simulation
+  profiles:
+    active: dev
   
   # 数据库配置
   datasource:
@@ -54,12 +56,21 @@ spring:
 
 # 仿真系统配置
 simulation:
-  clock:
-    time-step: 100  # 时间步长(ms)
-    max-threads: 8  # 最大计算线程数
+  # 默认仿真参数
+  default:
+    time-step: 0.01  # 仿真时间步长（秒）
+    max-entities: 100  # 最大实体数量
+    airspace:
+      width: 1000.0   # 空域宽度（米）
+      height: 1000.0  # 空域高度（米）
+      depth: 500.0    # 空域深度（米）
+  
+  # 环境参数
   environment:
-    spatial-index-depth: 8  # 空间索引深度
-    cache-ttl: 300  # 缓存TTL(秒)
+    wind-speed: 0.0      # 风速（m/s）
+    wind-direction: 0.0  # 风向（度）
+    temperature: 20.0    # 温度（摄氏度）
+    weather-enabled: false
   message:
     serialization:
       type: msgpack
@@ -87,7 +98,7 @@ airsim:
 server:
   port: 8080
   servlet:
-    context-path: /api/v1
+    context-path: /api
 
 # 监控配置
 management:
@@ -102,4 +113,17 @@ management:
 logging:
   level:
     com.simulation.drone: INFO
-    com.simulation.drone.adapter.airsim: DEBUG 
+    com.simulation.drone.adapter.airsim: DEBUG
+    com.JP.dronesim: DEBUG
+    com.JP.dronesim.infrastructure.external.airsim: INFO
+    org.msgpack: WARN
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
+  file:
+    name: logs/drone-simulation.log
+
+# WebSocket配置
+websocket:
+  endpoint: /simulation-websocket
+  allowed-origins: "*" 
