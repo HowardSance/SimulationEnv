@@ -67,13 +67,6 @@ src/main/java/com/JP/dronesim/
 
 ## 🚀 快速开始
 
-### 环境要求
-
-- **Java**: 11 或更高版本
-- **Maven**: 3.6 或更高版本
-- **PostgreSQL**: 12 或更高版本
-- **AirSim**: 1.7.0 或更高版本（可选，用于物理仿真）
-
 ### 安装步骤
 
 1. **克隆项目**
@@ -82,7 +75,7 @@ src/main/java/com/JP/dronesim/
    cd SimulationEnv
    ```
 
-2. **配置数据库**
+2. **配置数据库**   // TODO
    ```bash
    # 创建数据库
    createdb drone_simulation
@@ -329,7 +322,6 @@ mvn jacoco:report
 open target/site/jacoco/index.html
 ```
 
-## 📊 监控与运维
 
 ### 健康检查
 
@@ -372,10 +364,6 @@ logging:
 - **项目维护者**: HowardSance
 - **邮箱**: [your-email@example.com]
 - **项目地址**: https://github.com/HowardSance/SimulationEnv
-
-## 🙏 致谢
-
-感谢所有为这个项目做出贡献的开发者和研究人员。
 
 ---
 
