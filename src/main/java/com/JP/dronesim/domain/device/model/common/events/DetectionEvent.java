@@ -96,7 +96,23 @@ public class DetectionEvent {
         // 参数验证
         validateParameters();
     }
-    
+
+    public DetectionEvent(String targetId, LocalDateTime detectionTime, String eventId, LocalDateTime timestamp, String detectorId, String detectorName, String detectedUavId, String detectedUavName, Position detectedPosition, double confidence, double detectionDistance, String description) {
+        this.eventId = eventId;
+        this.timestamp = timestamp;
+        this.detectorId = detectorId;
+        this.detectorName = detectorName;
+        this.detectedUavId = detectedUavId;
+        this.detectedUavName = detectedUavName;
+        this.detectedPosition = detectedPosition;
+        this.confidence = confidence;
+        this.detectionDistance = detectionDistance;
+        this.description = description;
+    }
+
+    public DetectionEvent(String targetId, LocalDateTime detectionTime) {
+    }
+
     /**
      * 验证构造参数的有效性
      * 

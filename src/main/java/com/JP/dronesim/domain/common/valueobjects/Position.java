@@ -155,4 +155,7 @@ public class Position {
     public String toString() {
         return String.format("Position{x=%.2f, y=%.2f, z=%.2f}", x, y, z);
     }
+
+    public double distanceTo2D(Position targetPos) {
+    }
 } 

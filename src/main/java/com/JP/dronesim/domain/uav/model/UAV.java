@@ -549,4 +549,7 @@ public class UAV {
         return String.format("UAV{id='%s', name='%s', position=%s, status=%s, battery=%.1f%%}",
                            id, name, position, status, batteryLevel);
     }
+
+    public double getRadioFrequency() {
+    }
 } 
