@@ -65,73 +65,6 @@ src/main/java/com/JP/dronesim/
 - **值对象**：`PhysicalProperties` - 物理特性
 - **职责**：飞行路径管理、状态更新、物理特征生成
 
-## 🚀 快速开始
-
-### 安装步骤
-
-1. **克隆项目**
-   ```bash
-   git clone git@github.com:HowardSance/SimulationEnv.git
-   cd SimulationEnv
-   ```
-
-2. **配置数据库**   // TODO
-   ```bash
-   # 创建数据库
-   createdb drone_simulation
-   
-   # 运行数据库迁移（如果使用Flyway）
-   mvn flyway:migrate
-   ```
-
-3. **配置应用参数**
-   ```bash
-   # 复制配置文件模板
-   cp src/main/resources/application.yml.example src/main/resources/application.yml
-   
-   # 编辑配置文件
-   vim src/main/resources/application.yml
-   ```
-
-4. **编译项目**
-   ```bash
-   mvn clean compile
-   ```
-
-5. **运行应用**
-   ```bash
-   mvn spring-boot:run
-   ```
-
-### 配置文件说明
-
-```yaml
-# 数据库配置
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/drone_simulation
-    username: your_username
-    password: your_password
-
-# AirSim配置
-airsim:
-  host: localhost
-  port: 41451
-  connection:
-    timeout: 5000
-    retry:
-      max-attempts: 3
-
-# 仿真参数
-simulation:
-  default:
-    time-step: 0.01
-    max-entities: 100
-    airspace:
-      width: 1000.0
-      height: 1000.0
-      depth: 500.0
-```
 
 ## 📖 开发指南
 
@@ -167,6 +100,164 @@ SimulationEnv/
 ├── README.md                          # 项目说明
 └── ARCHITECTURE.md                    # 架构文档
 ```
+---
+
+## 一、Interface Layer（接口层）
+
+### 1.1 作用与职责
+- 作为系统对外界的统一入口，处理外部请求和响应
+- 接收HTTP请求和WebSocket消息
+- 参数校验和格式转换
+- 调用应用层服务
+- 返回标准化的响应格式
+- 异常处理和错误响应
+
+### 1.2 模块功能划分
+- **REST控制器**：
+  - `SimulationController`：仿真控制接口
+  - `AirspaceController`：空域管理接口
+  - `DeviceController`：设备管理接口
+  - `UavController`：无人机管理接口
+  - `QueryController`：数据查询接口
+- **WebSocket处理器**：
+  - `SimulationWebSocketHandler`：仿真WebSocket处理器
+- **异常处理**：
+  - `GlobalExceptionHandler`：全局异常处理器
+
+### 1.3 开发指导
+- 参数校验：使用`@Validated`注解
+- 响应格式：统一标准格式
+- 异常处理：统一捕获和处理
+- 接口文档：每个接口需有文档说明
+
+---
+
+## 二、Application Layer（应用层）
+
+### 2.1 作用与职责
+- 协调领域对象完成业务用例，实现业务流程
+- 业务流程编排、事务管理、权限校验、数据转换、调用领域服务
+
+### 2.2 模块功能划分
+- **应用服务**：
+  - `SimulationAppService`：仿真应用服务
+  - `AirspaceManagementAppService`：空域管理应用服务
+  - `DeviceManagementAppService`：设备管理应用服务
+  - `UAVManagementAppService`：无人机管理应用服务
+  - `QueryAppService`：查询应用服务
+- **DTO**：
+  - 请求DTO：`SimulationControlCommandDTO`、`AirspaceConfigDTO`、`EnvironmentUpdateParamsDTO`、`DeviceInitParamsDTO`、`AdjustDeviceParamDTO`、`UAVStateDTO`
+  - 响应DTO：`SimulationStatusDTO`、`AirspaceDetailsDTO`、`EntityStateDTO`、`DeviceDetailsDTO`、`DetectionLogEntryDTO`
+  - 事件DTO：用于WebSocket事件推送
+
+### 2.3 开发指导
+- 应用服务只负责业务流程编排，不包含复杂业务规则
+- 使用`@Transactional`管理事务
+- DTO与领域对象转换在应用层完成
+- 权限和业务规则校验在应用层
+
+---
+
+## 三、Domain Layer（领域层）
+
+### 3.1 作用与职责
+- 包含核心业务逻辑和领域模型，是系统的核心
+- 定义领域模型（实体、值对象、聚合根）、实现核心业务逻辑、定义领域服务、仓储接口
+
+### 3.2 模块功能划分
+- **空域模块**：
+  - `Airspace`：空域聚合根
+  - `EnvironmentParameters`：环境参数值对象
+  - `IAirspaceRepository`：空域仓储接口
+- **设备模块**：
+  - `AbstractProbeDevice`：探测设备抽象基类
+  - `opticalcamera/`、`radar/`、`radiodetector/`、`gpsjammer/`：各类设备模型
+  - `IProbeDeviceRepository`：设备仓储接口
+- **无人机模块**：
+  - `UAV`：无人机聚合根
+  - `Waypoint`：航点实体
+  - `PhysicalProperties`：物理特性值对象
+  - `IUAVRepository`：无人机仓储接口
+- **通用模块**：
+  - `valueobjects/`：值对象（Position、Velocity、Orientation等）
+  - `enums/`：枚举（DeviceType、UAVStatus、DeviceStatus等）
+- **领域服务**：
+  - `DetectionService`：探测服务
+  - `SimulationEngineService`：仿真引擎服务
+
+### 3.3 开发指导
+- 所有核心业务规则都在领域层实现
+- 实体和值对象要体现业务概念
+- 合理设计聚合边界，保证数据一致性
+- 跨聚合业务逻辑放在领域服务中
+
+---
+
+## 四、Infrastructure Layer（基础设施层）
+
+### 4.1 作用与职责
+- 提供技术实现细节，支持其他层的功能
+- 数据持久化、外部服务集成、消息传递、配置管理、工具类
+
+### 4.2 模块功能划分
+- **持久化模块**：
+  - `repositoryimpl/`：仓储实现
+  - `ORM/`：对象关系映射
+- **外部服务模块**：
+  - `airsim/`：AirSim集成模块
+  - `realtime/websocket/`：WebSocket服务
+- **配置模块**：
+  - `DatabaseConfig`、`WebSocketConfig`、`AirSimConfig`：系统配置
+- **工具模块**：
+  - `SpatialConverter`：空间坐标转换工具
+
+### 4.3 开发指导
+- 专注于技术细节的实现
+- 实现领域层定义的接口
+- 统一管理系统配置
+- 提供可复用的工具方法
+
+---
+
+## 五、层间交互关系
+
+- Interface Layer → Application Layer → Domain Layer
+- Infrastructure Layer → Domain Layer
+
+- 上层只能依赖下层，不能反向依赖
+- 通过接口进行层间交互
+- 使用DTO在层间传递数据
+- 接口层 仅依赖 应用层
+- 应用层 依赖 领域层
+- 领域层 通过接口依赖 基础设施层（由基础设施层实现领域接口）
+- 基础设施层 只为领域层和应用层提供技术支撑，不反向依赖
+- 
+
+---
+
+## 开发人员开发指导
+
+### 6.1 新功能开发流程
+1. 分析需求，确定功能属于哪个业务领域
+2. 在领域层定义实体和值对象
+3. 在领域层或应用层实现业务逻辑
+4. 在接口层定义API接口
+5. 在基础设施层实现技术细节
+
+### 6.2 代码规范
+- 遵循项目命名规范
+- 每个类和方法都要有JavaDoc注释
+- 统一使用项目异常处理机制
+- 合理使用日志记录
+- 命名规范：类名 PascalCase，方法 camelCase，常量 UPPER_SNAKE_CASE
+- 参数校验：接口层用 @Validated
+- 异常处理：统一自定义异常体系
+- 日志记录：按级别、含上下文，避免敏感信息
+- 单元测试：每个服务类需有测试，关键流程需集成测试
+- DTO 与领域对象转换在应用层完成
+- 权限和业务规则校验在应用层
+- 领域层只处理核心业务规则
+
 
 ### 开发规范
 
@@ -364,7 +455,4 @@ logging:
 - **项目维护者**: HowardSance
 - **邮箱**: [your-email@example.com]
 - **项目地址**: https://github.com/HowardSance/SimulationEnv
-
 ---
-
-**注意**: 这是一个持续开发的项目，文档会随着功能更新而更新。如有问题，请提交Issue或联系项目维护者。 
