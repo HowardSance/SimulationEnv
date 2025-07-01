@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 查询REST控制�?
+ * 查询REST控制器
  * 处理数据查询相关的HTTP请求
  *
  * @author JP Team
@@ -25,10 +25,10 @@ public class QueryController {
     private QueryAppService queryAppService;
 
     /**
-     * 获取空域内所有实体状�?
+     * 获取空域内所有实体状态
      *
      * @param airspaceId 空域ID
-     * @return 实体状态列�?
+     * @return 实体状态列表
      */
     @GetMapping("/airspace/{airspaceId}/entities")
     public ResponseEntity<List<EntityStateDTO>> getAllEntityStates(@PathVariable String airspaceId) {
@@ -41,11 +41,11 @@ public class QueryController {
     }
 
     /**
-     * 获取特定实体状�?
+     * 获取特定实体状态
      *
      * @param airspaceId 空域ID
      * @param entityId 实体ID
-     * @return 实体状�?
+     * @return 实体状态
      */
     @GetMapping("/airspace/{airspaceId}/entities/{entityId}")
     public ResponseEntity<EntityStateDTO> getEntityState(
@@ -64,7 +64,7 @@ public class QueryController {
      *
      * @param airspaceId 空域ID
      * @param entityType 实体类型
-     * @return 实体状态列�?
+     * @return 实体状态列表
      */
     @GetMapping("/airspace/{airspaceId}/entities/type/{entityType}")
     public ResponseEntity<List<EntityStateDTO>> getEntitiesByType(
@@ -178,7 +178,7 @@ public class QueryController {
     }
 
     /**
-     * 获取无人机飞行轨�?
+     * 获取无人机飞行轨迹
      *
      * @param airspaceId 空域ID
      * @param uavId 无人机ID
@@ -218,7 +218,7 @@ public class QueryController {
      * 搜索实体
      *
      * @param airspaceId 空域ID
-     * @param keyword 搜索关键�?
+     * @param keyword 搜索关键词
      * @param entityType 实体类型（可选）
      * @return 搜索结果
      */

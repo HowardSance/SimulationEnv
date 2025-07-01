@@ -15,12 +15,12 @@ public class AirSimRpcMessageTrait implements MessagePackable{
 		
 		Field[] fields = this.getClass().getDeclaredFields();
 		 pk.writeMapBegin(fields.length);
-		 
+
 		 for (Field f : fields) {
 			String key = f.getName();
-			
+
 			pk.write(key);
-		
+
 			try {
 				pk.write(f.get(this));
 			} catch (IllegalArgumentException e) {
@@ -33,30 +33,27 @@ public class AirSimRpcMessageTrait implements MessagePackable{
 		}
 		 pk.writeMapEnd();
 	}
-	
+
 	public void readFrom(Unpacker u) throws IOException {
 		if(u.getNextType().equals(ValueType.MAP)) {
 			u.readMapBegin();
-			
+
 			HashMap<String, Field> fields = new HashMap<String, Field>();
 			for (Field f : this.getClass().getDeclaredFields()) {
 				fields.put(f.getName(), f);
-				
 			}
-			
 			while(!u.trySkipNil() && u.getNextType()==ValueType.RAW) {
 				String key = u.readString();
-				
+
 				Field fie = fields.get(key);
 				if(fie==null) {
 					System.out.println("Fields not found");
 				}
-				
+
 			 Object value = u.read(fie.getType());
 			 try {
 				 this.getClass().getDeclaredField(key).set(this, value);
-				
-				
+
 			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {
@@ -67,12 +64,11 @@ public class AirSimRpcMessageTrait implements MessagePackable{
 				e.printStackTrace();
 			}
 			}
-			
+
 			u.readMapEnd();
-			
+
 		}
-		
-		
+
 	}
 
 }

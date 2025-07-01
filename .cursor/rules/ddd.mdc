@@ -23,19 +23,19 @@ backend/
 │   │   │   └── com/JP/dronesim/
 │   │   │       ├── application/
 │   │   │       │   ├── services/           // 应用服务
-│   │   │       │   │   ├── AirspaceManagementAppService.java  // 负责场景的创建、加载、保存、查询等用例协调 
+│   │   │       │   │   ├── AirspaceManagementAppService.java  // 负责场景的创建、加载、保存、查询等用例协调
 │   │   │       │   │   ├── DeviceManagementAppService.java    // 探测设备的部署、删除、修改等
 │   │   │       │   │   ├── UAVManagementAppService.java       // 无人机的部署、删除、修改、飞行路径设置等
 │   │   │       │   │   ├── SimulationAppService.java        // 仿真的启动、暂停、恢复、停止、时间推进等
 │   │   │       │   │   └── QueryAppService.java             // 提供查询所有实体状态、特定设备详情、探测日志等
 │   │   │       │   └── dtos/
 │   │   │       │       ├── request/        // 请求DTO
-│   │   │       │       │   ├── AirspaceConfigDTO.java         // 用于初始化空域配置 
-│   │   │       │       │   ├── EnvironmentUpdateParamsDTO.java  // 动态更新环境参数 
-│   │   │       │       │   ├── DeviceInitParamsDTO.java       // 初始化探测设备 
-│   │   │       │       │   ├── UAVStateDTO.java               // 初始化无人机状态 
-│   │   │       │       │   ├── SimulationControlCommandDTO.java // 仿真控制指令 (start/pause/stop) 
-│   │   │       │       │   └── AdjustDeviceParamDTO.java      // 设备参数热调整 
+│   │   │       │       │   ├── AirspaceConfigDTO.java         // 用于初始化空域配置
+│   │   │       │       │   ├── EnvironmentUpdateParamsDTO.java  // 动态更新环境参数
+│   │   │       │       │   ├── DeviceInitParamsDTO.java       // 初始化探测设备
+│   │   │       │       │   ├── UAVStateDTO.java               // 初始化无人机状态
+│   │   │       │       │   ├── SimulationControlCommandDTO.java // 仿真控制指令 (start/pause/stop)
+│   │   │       │       │   └── AdjustDeviceParamDTO.java      // 设备参数热调整
 │   │   │       │       ├── response/       // 响应DTO
 │   │   │       │       │   ├── AirspaceDetailsDTO.java        // 空域详情（包含实体列表）
 │   │   │       │       │   ├── EntityStateDTO.java            // 实体（设备/无人机）的当前状态，用于实时推送和查询
@@ -43,80 +43,80 @@ backend/
 │   │   │       │       │   ├── DetectionLogEntryDTO.java      // 探测日志条目
 │   │   │       │       │   └── SimulationStatusDTO.java       // 仿真整体状态
 │   │   │       │       └── event/          // 事件DTO
-│   │   │       │           ├── UAVPositionUpdateEventDTO.java // 无人机位置更新事件 
-│   │   │       │           ├── DeviceStatusUpdateEventDTO.java// 设备状态更新事件 
-│   │   │       │           ├── DetectionEventDTO.java         // 探测事件 
-│   │   │       │           ├── EntityAddedEventDTO.java       // 新实体添加事件 
-│   │   │       │           └── EntityRemovedEventDTO.java     // 实体移除事件 
+│   │   │       │           ├── UAVPositionUpdateEventDTO.java // 无人机位置更新事件
+│   │   │       │           ├── DeviceStatusUpdateEventDTO.java// 设备状态更新事件
+│   │   │       │           ├── DetectionEventDTO.java         // 探测事件
+│   │   │       │           ├── EntityAddedEventDTO.java       // 新实体添加事件
+│   │   │       │           └── EntityRemovedEventDTO.java     // 实体移除事件
 │   │   │       ├── domain/
 │   │   │       │   ├── airspace/
 │   │   │       │   │   ├── model/          // 聚合根
-│   │   │       │   │   │   ├── Airspace.java                 // 空域领域模型，管理三维模拟空间、环境参数和所有实体 
+│   │   │       │   │   │   ├── Airspace.java                 // 空域领域模型，管理三维模拟空间、环境参数和所有实体
 │   │   │       │   │   │   │               // 值对象
-│   │   │       │   │   │   ├── EnvironmentParameters.java    // 封装天气、温度、风向量等环境属性 
-│   │   │       │   │   │   └── TimeStep.java                 // 仿真时间步长 
+│   │   │       │   │   │   ├── EnvironmentParameters.java    // 封装天气、温度、风向量等环境属性
+│   │   │       │   │   │   └── TimeStep.java                 // 仿真时间步长
 │   │   │       │   │   └── repository/     // 仓储接口
-│   │   │       │   │       └── IAirspaceRepository.java      // 定义空域聚合的持久化(保存、加载) 
+│   │   │       │   │       └── IAirspaceRepository.java      // 定义空域聚合的持久化(保存、加载)
 │   │   │       │   ├── device/
 │   │   │       │   │   ├── model/
-│   │   │       │   │   │   ├── ProbeDevice.java              // 聚合根：所有探测设备基类接口或抽象类 
+│   │   │       │   │   │   ├── ProbeDevice.java              // 聚合根：所有探测设备基类接口或抽象类
 │   │   │       │   │   │   ├── common/
-│   │   │       │   │   │   │   ├── SensorParameters.java   // 接口/抽象类：传感器参数通用接口 
-│   │   │       │   │   │   │   └── DetectionLog.java         // 实体：探测日志列表，包含DetectionEvent 
+│   │   │       │   │   │   │   ├── SensorParameters.java   // 接口/抽象类：传感器参数通用接口
+│   │   │       │   │   │   │   └── DetectionLog.java         // 实体：探测日志列表，包含DetectionEvent
 │   │   │       │   │   │   ├── opticalcamera/
-│   │   │       │   │   │   │   ├── OpticalCamera.java      // 实体：光电摄像头领域模型 
-│   │   │       │   │   │   │   └── OpticalParameters.java  // 值对象：光电摄像头特有参数 (分辨率、焦距、灵敏度等) 
+│   │   │       │   │   │   │   ├── OpticalCamera.java      // 实体：光电摄像头领域模型
+│   │   │       │   │   │   │   └── OpticalParameters.java  // 值对象：光电摄像头特有参数 (分辨率、焦距、灵敏度等)
 │   │   │       │   │   │   ├── radar/
-│   │   │       │   │   │   │   ├── ElectromagneticRadar.java // 实体：电磁波雷达领域模型 
-│   │   │       │   │   │   │   └── RadarParameters.java    // 值对象：雷达特有参数 (频率、功率、增益、信噪比等) 
+│   │   │       │   │   │   │   ├── ElectromagneticRadar.java // 实体：电磁波雷达领域模型
+│   │   │       │   │   │   │   └── RadarParameters.java    // 值对象：雷达特有参数 (频率、功率、增益、信噪比等)
 │   │   │       │   │   │   ├── radiodetector/
-│   │   │       │   │   │   │   ├── RadioDetector.java      // 实体：无线电侦测器领域模型 
-│   │   │       │   │   │   │   └── RadioParameters.java    // 值对象：无线电侦测特有参数 (频率范围、方向探测精度等) 
+│   │   │       │   │   │   │   ├── RadioDetector.java      // 实体：无线电侦测器领域模型
+│   │   │       │   │   │   │   └── RadioParameters.java    // 值对象：无线电侦测特有参数 (频率范围、方向探测精度等)
 │   │   │       │   │   │   ├── gpsjammer/
-│   │   │       │   │   │   │   ├── GPSJammer.java          // 实体：GPS诱导器领域模型 
-│   │   │       │   │   │   │   └── JammerParameters.java   // 值对象：诱导器特有参数 (诱导频率、功率、信号类型等) 
+│   │   │       │   │   │   │   ├── GPSJammer.java          // 实体：GPS诱导器领域模型
+│   │   │       │   │   │   │   └── JammerParameters.java   // 值对象：诱导器特有参数 (诱导频率、功率、信号类型等)
 │   │   │       │   │   │   └── events/         // 值对象
-│   │   │       │   │   │       └── DetectionEvent.java     // 探测事件信息(时间戳、探测器、被探测UAV、置信度) 
+│   │   │       │   │   │       └── DetectionEvent.java     // 探测事件信息(时间戳、探测器、被探测UAV、置信度)
 │   │   │       │   │   └── repository/         // 仓储接口
-│   │   │       │   │       └── IProbeDeviceRepository.java   // 定义探测设备聚合的持久化契约 
+│   │   │       │   │       └── IProbeDeviceRepository.java   // 定义探测设备聚合的持久化契约
 │   │   │       │   ├── uav/
 │   │   │       │   │   ├── model/
-│   │   │       │   │   │   ├── UAV.java                      // 聚合根：无人机领域模型 
-│   │   │       │   │   │   ├── Waypoint.java                 // 实体：飞行路径上的航点 
-│   │   │       │   │   │   └── PhysicalProperties.java       // 值对象：封装无人机物理特性 (无线电信号发射功率) 
+│   │   │       │   │   │   ├── UAV.java                      // 聚合根：无人机领域模型
+│   │   │       │   │   │   ├── Waypoint.java                 // 实体：飞行路径上的航点
+│   │   │       │   │   │   └── PhysicalProperties.java       // 值对象：封装无人机物理特性 (无线电信号发射功率)
 │   │   │       │   │   └── repository/
-│   │   │       │   │       └── IUAVRepository.java           // 仓储接口：定义无人机聚合的持久化契约 
+│   │   │       │   │       └── IUAVRepository.java           // 仓储接口：定义无人机聚合的持久化契约
 │   │   │       │   ├── common/
 │   │   │       │   │   ├── valueobjects/           // 值对象
-│   │   │       │   │   │   ├── Position.java                 // 3D位置 (x, y, z) 
-│   │   │       │   │   │   ├── Orientation.java              // 3D姿态 (四元数或欧拉角) 
-│   │   │       │   │   │   ├── Velocity.java                 // 3D速度 (vx, vy, vz) 
-│   │   │       │   │   │   └── Acceleration.java             // 3D加速度 (ax, ay, az) 
+│   │   │       │   │   │   ├── Position.java                 // 3D位置 (x, y, z)
+│   │   │       │   │   │   ├── Orientation.java              // 3D姿态 (四元数或欧拉角)
+│   │   │       │   │   │   ├── Velocity.java                 // 3D速度 (vx, vy, vz)
+│   │   │       │   │   │   └── Acceleration.java             // 3D加速度 (ax, ay, az)
 │   │   │       │   │   └── enums/          // 枚举
 │   │   │       │   │       ├── DeviceType.java             // 设备类型枚举
-│   │   │       │   │       ├── UAVStatus.java              // 无人机运行状态 ("悬停", "运动", "侦测") 
-│   │   │       │   │       └── DeviceStatus.java           // 设备运行状态 ("active", "inactive", "error") 
+│   │   │       │   │       ├── UAVStatus.java              // 无人机运行状态 ("悬停", "运动", "侦测")
+│   │   │       │   │       └── DeviceStatus.java           // 设备运行状态 ("active", "inactive", "error")
 │   │   │       │   └── services/           // 领域服务
-│   │   │       │       ├── DetectionService.java         // 执行探测判定逻辑 (雷达方程、光电识别、无线电信号传播等) 
+│   │   │       │       ├── DetectionService.java         // 执行探测判定逻辑 (雷达方程、光电识别、无线电信号传播等)
 │   │   │       │       └── SimulationEngineService.java  // 推进仿真时间，协调Airspace、UAV移动和ProbeDevice探测
 │   │   │       ├── infrastructure/             // 基础设施层
 │   │   │       │   ├── persistence/
 │   │   │       │   │   ├── repositoryimpl/         // 仓储实现
-│   │   │       │   │   │   ├── AirspaceRepositoryImpl.java   // IAirspaceRepository的PostgreSQL实现 
-│   │   │       │   │   │   ├── ProbeDeviceRepositoryImpl.java // IProbeDeviceRepository的PostgreSQL实现 
-│   │   │       │   │   │   └── UAVRepositoryImpl.java        // IUAVRepository的PostgreSQL实现 
+│   │   │       │   │   │   ├── AirspaceRepositoryImpl.java   // IAirspaceRepository的PostgreSQL实现
+│   │   │       │   │   │   ├── ProbeDeviceRepositoryImpl.java // IProbeDeviceRepository的PostgreSQL实现
+│   │   │       │   │   │   └── UAVRepositoryImpl.java        // IUAVRepository的PostgreSQL实现
 │   │   │       │   │   └── ORM/
-│   │   │       │   │       ├── AirspaceJpaModel.java        // `airspaces`表的持久化模型 
-│   │   │       │   │       ├── EntityJpaModel.java          // `entities`表的持久化模型 (通用实体表) 
-│   │   │       │   │       └── DetectionEventJpaModel.java  // `detection_events`表的持久化模型 
+│   │   │       │   │       ├── AirspaceJpaModel.java        // `airspaces`表的持久化模型
+│   │   │       │   │       ├── EntityJpaModel.java          // `entities`表的持久化模型 (通用实体表)
+│   │   │       │   │       └── DetectionEventJpaModel.java  // `detection_events`表的持久化模型
 │   │   │       │   ├── external/
 │   │   │       │   │   ├── airsim/
-│   │   │       │   │   │   ├── AirSimApiClient.java          // 外部服务客户端：封装与AirSim仿真器API的通信逻辑 
+│   │   │       │   │   │   ├── AirSimApiClient.java          // 外部服务客户端：封装与AirSim仿真器API的通信逻辑
 │   │   │       │   │   │   └── dto/
 │   │   │       │   │   │       └── AirSimDetectionResponseDTO.java // AirSim API响应数据模型
 │   │   │       │   ├── realtime/
 │   │   │       │   │   ├── websocket/          // 实时通信服务
-│   │   │       │   │   │   ├── WebSocketService.java         // 实现WebSocket服务器，后端向前端推送实时仿真数据 
+│   │   │       │   │   │   ├── WebSocketService.java         // 实现WebSocket服务器，后端向前端推送实时仿真数据
 │   │   │       │   │   │   └── WebSocketSessionManager.java  // WebSocket会话管理
 │   │   │       │   ├── config/         // 配置类
 │   │   │       │   │   ├── DatabaseConfig.java             // 数据库连接配置
@@ -127,15 +127,15 @@ backend/
 │   │   │       └── interface/          // 接口层
 │   │   │           ├── rest/
 │   │   │           │   ├── controller/         // REST控制器
-│   │   │           │   │   ├── SimulationController.java     // 处理仿真控制（启动/暂停/停止）相关的HTTP请求 
-│   │   │           │   │   ├── AirspaceController.java       // 处理场景管理（创建/加载/保存）相关的HTTP请求 
-│   │   │           │   │   ├── DeviceController.java         // 处理设备部署/删除/修改相关的HTTP请求 
-│   │   │           │   │   ├── UavController.java            // 处理无人机部署/删除/修改相关的HTTP请求 
+│   │   │           │   │   ├── SimulationController.java     // 处理仿真控制（启动/暂停/停止）相关的HTTP请求
+│   │   │           │   │   ├── AirspaceController.java       // 处理场景管理（创建/加载/保存）相关的HTTP请求
+│   │   │           │   │   ├── DeviceController.java         // 处理设备部署/删除/修改相关的HTTP请求
+│   │   │           │   │   ├── UavController.java            // 处理无人机部署/删除/修改相关的HTTP请求
 │   │   │           │   │   └── QueryController.java          // 处理数据查询相关的HTTP请求
 │   │   │           │   └── exception/
 │   │   │           │       └── GlobalExceptionHandler.java   // 全局异常处理器
 │   │   │           └── websocket/              // WebSocket处理器
-│   │   │               └── SimulationWebSocketHandler.java // 处理前端发送的实时指令 (参数热调整、仿真控制) 
+│   │   │               └── SimulationWebSocketHandler.java // 处理前端发送的实时指令 (参数热调整、仿真控制)
 │   │   └── resources/
 │   │       └── application.yml // 应用程序配置
 │   └── test/

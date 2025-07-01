@@ -5,7 +5,7 @@ import com.JP.dronesim.application.dtos.request.AdjustDeviceParamDTO;
 import com.JP.dronesim.application.dtos.response.DeviceDetailsDTO;
 import com.JP.dronesim.domain.airspace.model.Airspace;
 import com.JP.dronesim.domain.airspace.repository.IAirspaceRepository;
-import com.JP.dronesim.domain.device.model.AbstractProbeDevice;
+import com.JP.dronesim.domain.device.model.ProbeDevice;
 import com.JP.dronesim.domain.device.model.opticalcamera.OpticalCamera;
 import com.JP.dronesim.domain.device.model.opticalcamera.OpticalCameraFactory;
 import com.JP.dronesim.domain.device.model.radar.ElectromagneticRadar;
@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
 
 /**
  * 设备管理应用服务
@@ -42,7 +43,7 @@ public class DeviceManagementAppService {
      * 部署探测设备
      *
      * @param airspaceId 空域ID
-     * @param deviceParams 设备初始化参�?
+     * @param deviceParams 设备初始化参数
      * @return 设备详情
      */
     public DeviceDetailsDTO deployDevice(String airspaceId, DeviceInitParamsDTO deviceParams) {
@@ -51,16 +52,17 @@ public class DeviceManagementAppService {
         validateDeviceParams(deviceParams);
 
         // 获取空域
-        Airspace airspace = airspaceRepository.findById(airspaceId);
+        Airspace airspace = airspaceRepository.findById(airspaceId)
+            .orElseThrow(() -> new RuntimeException("空域不存在 " + airspaceId));
 
         // 校验设备位置是否在空域边界内
         validateDevicePosition(airspace, deviceParams.getPosition());
 
         // 创建设备
-        AbstractProbeDevice device = createDevice(deviceParams);
+        ProbeDevice device = createDevice(deviceParams);
 
-        // 添加到空�?
-        airspace.addEntity(device);
+        // 添加到空域
+        airspace.addProbeDevice(device);
         airspaceRepository.save(airspace);
 
         // 转换为DTO
@@ -80,18 +82,19 @@ public class DeviceManagementAppService {
         validateDeviceParamsList(deviceParamsList);
 
         // 获取空域
-        Airspace airspace = airspaceRepository.findById(airspaceId);
+        Airspace airspace = airspaceRepository.findById(airspaceId)
+            .orElseThrow(() -> new RuntimeException("空域不存在 " + airspaceId));
 
         // 批量创建设备
-        List<AbstractProbeDevice> devices = deviceParamsList.stream()
+        List<ProbeDevice> devices = deviceParamsList.stream()
                 .map(params -> {
                     validateDevicePosition(airspace, params.getPosition());
                     return createDevice(params);
                 })
                 .collect(Collectors.toList());
 
-        // 批量添加到空�?
-        devices.forEach(airspace::addEntity);
+        // 批量添加到空域
+        devices.forEach(airspace::addProbeDevice);
         airspaceRepository.save(airspace);
 
         // 转换为DTO
@@ -112,12 +115,13 @@ public class DeviceManagementAppService {
         validateAirspaceExists(airspaceId);
 
         // 获取空域
-        Airspace airspace = airspaceRepository.findById(airspaceId);
+        Airspace airspace = airspaceRepository.findById(airspaceId)
+            .orElseThrow(() -> new RuntimeException("空域不存在 " + airspaceId));
 
         // 获取设备
-        AbstractProbeDevice device = airspace.getDevice(deviceId);
+        ProbeDevice device = airspace.getProbeDevices().get(deviceId);
         if (device == null) {
-            throw new RuntimeException("设备不存�? " + deviceId);
+            throw new RuntimeException("设备不存在 " + deviceId);
         }
 
         // 转换为DTO
@@ -125,7 +129,7 @@ public class DeviceManagementAppService {
     }
 
     /**
-     * 获取空域内所有设�?
+     * 获取空域内所有设备
      *
      * @param airspaceId 空域ID
      * @return 设备列表
@@ -135,10 +139,11 @@ public class DeviceManagementAppService {
         validateAirspaceExists(airspaceId);
 
         // 获取空域
-        Airspace airspace = airspaceRepository.findById(airspaceId);
+        Airspace airspace = airspaceRepository.findById(airspaceId)
+            .orElseThrow(() -> new RuntimeException("空域不存在 " + airspaceId));
 
-        // 获取所有设�?
-        List<AbstractProbeDevice> devices = airspace.getAllDevices();
+        // 获取所有设备
+        List<ProbeDevice> devices = new ArrayList<>(airspace.getProbeDevices().values());
 
         // 转换为DTO
         return devices.stream()
@@ -159,10 +164,11 @@ public class DeviceManagementAppService {
         validateDeviceType(deviceType);
 
         // 获取空域
-        Airspace airspace = airspaceRepository.findById(airspaceId);
+        Airspace airspace = airspaceRepository.findById(airspaceId)
+            .orElseThrow(() -> new RuntimeException("空域不存在 " + airspaceId));
 
-        // 获取指定类型的设�?
-        List<AbstractProbeDevice> devices = airspace.getDevicesByType(DeviceType.valueOf(deviceType.toUpperCase()));
+        // 获取指定类型的设备
+        List<ProbeDevice> devices = airspace.getProbeDevicesByType(DeviceType.valueOf(deviceType.toUpperCase()));
 
         // 转换为DTO
         return devices.stream()
@@ -183,12 +189,13 @@ public class DeviceManagementAppService {
         validateDeviceParams(params);
 
         // 获取空域
-        Airspace airspace = airspaceRepository.findById(airspaceId);
+        Airspace airspace = airspaceRepository.findById(airspaceId)
+            .orElseThrow(() -> new RuntimeException("空域不存在 " + airspaceId));
 
         // 获取设备
-        AbstractProbeDevice device = airspace.getDevice(deviceId);
+        ProbeDevice device = airspace.getProbeDevices().get(deviceId);
         if (device == null) {
-            throw new RuntimeException("设备不存�? " + deviceId);
+            throw new RuntimeException("设备不存在 " + deviceId);
         }
 
         // 更新设备参数
@@ -199,72 +206,53 @@ public class DeviceManagementAppService {
     }
 
     /**
-     * 激活设�?
-     *
+     * 启用设备
      * @param airspaceId 空域ID
      * @param deviceId 设备ID
      */
     public void activateDevice(String airspaceId, String deviceId) {
-        // 业务规则校验
         validateAirspaceExists(airspaceId);
-
-        // 获取空域
-        Airspace airspace = airspaceRepository.findById(airspaceId);
-
-        // 获取设备
-        AbstractProbeDevice device = airspace.getDevice(deviceId);
+        Airspace airspace = airspaceRepository.findById(airspaceId)
+            .orElseThrow(() -> new RuntimeException("空域不存在 " + airspaceId));
+        ProbeDevice device = airspace.getProbeDevices().get(deviceId);
         if (device == null) {
-            throw new RuntimeException("设备不存�? " + deviceId);
+            throw new RuntimeException("设备不存在 " + deviceId);
         }
-
-        // 激活设�?
-        device.activate();
-
-        // 保存空域
+        device.enable();
         airspaceRepository.save(airspace);
     }
 
     /**
-     * 停用设备
-     *
+     * 禁用设备
      * @param airspaceId 空域ID
      * @param deviceId 设备ID
      */
     public void deactivateDevice(String airspaceId, String deviceId) {
-        // 业务规则校验
         validateAirspaceExists(airspaceId);
-
-        // 获取空域
-        Airspace airspace = airspaceRepository.findById(airspaceId);
-
-        // 获取设备
-        AbstractProbeDevice device = airspace.getDevice(deviceId);
+        Airspace airspace = airspaceRepository.findById(airspaceId)
+            .orElseThrow(() -> new RuntimeException("空域不存在 " + airspaceId));
+        ProbeDevice device = airspace.getProbeDevices().get(deviceId);
         if (device == null) {
-            throw new RuntimeException("设备不存�? " + deviceId);
+            throw new RuntimeException("设备不存在 " + deviceId);
         }
-
-        // 停用设备
-        device.deactivate();
-
-        // 保存空域
+        device.disable();
         airspaceRepository.save(airspace);
     }
 
     /**
-     * 删除设备
-     *
+     * 移除设备
      * @param airspaceId 空域ID
      * @param deviceId 设备ID
      */
     public void removeDevice(String airspaceId, String deviceId) {
-        // 业务规则校验
         validateAirspaceExists(airspaceId);
-
-        // 获取空域
-        Airspace airspace = airspaceRepository.findById(airspaceId);
-
-        // 删除设备
-        airspace.removeEntity(deviceId);
+        Airspace airspace = airspaceRepository.findById(airspaceId)
+            .orElseThrow(() -> new RuntimeException("空域不存在 " + airspaceId));
+        ProbeDevice device = airspace.getProbeDevices().get(deviceId);
+        if (device == null) {
+            throw new RuntimeException("设备不存在 " + deviceId);
+        }
+        airspace.removeProbeDevice(deviceId);
         airspaceRepository.save(airspace);
     }
 
@@ -281,16 +269,60 @@ public class DeviceManagementAppService {
         validateAirspaceExists(airspaceId);
 
         // 获取空域
-        Airspace airspace = airspaceRepository.findById(airspaceId);
+        Airspace airspace = airspaceRepository.findById(airspaceId)
+            .orElseThrow(() -> new RuntimeException("空域不存在 " + airspaceId));
 
         // 获取设备
-        AbstractProbeDevice device = airspace.getDevice(deviceId);
+        ProbeDevice device = airspace.getProbeDevices().get(deviceId);
         if (device == null) {
-            throw new RuntimeException("设备不存�? " + deviceId);
+            throw new RuntimeException("设备不存在 " + deviceId);
         }
 
         // 获取探测日志
         return device.getDetectionLog().getRecentEvents(limit);
+    }
+
+    /**
+     * 批量参数调整
+     * @param airspaceId 空域ID
+     * @param deviceIds 设备ID列表
+     * @param params 参数
+     */
+    public void batchAdjustParameters(String airspaceId, List<String> deviceIds, AdjustDeviceParamDTO params) {
+        validateAirspaceExists(airspaceId);
+        Airspace airspace = airspaceRepository.findById(airspaceId)
+            .orElseThrow(() -> new RuntimeException("空域不存在 " + airspaceId));
+        for (String deviceId : deviceIds) {
+            ProbeDevice device = airspace.getProbeDevices().get(deviceId);
+            if (device != null) {
+                device.updateParameters(params.getParameters());
+            }
+        }
+        airspaceRepository.save(airspace);
+    }
+
+    /**
+     * 获取所有设备ID
+     * @param airspaceId 空域ID
+     * @return 设备ID列表
+     */
+    public List<String> getAllDeviceIds(String airspaceId) {
+        validateAirspaceExists(airspaceId);
+        Airspace airspace = airspaceRepository.findById(airspaceId)
+            .orElseThrow(() -> new RuntimeException("空域不存在 " + airspaceId));
+        return airspace.getProbeDevices().values().stream().map(ProbeDevice::getId).collect(Collectors.toList());
+    }
+
+    /**
+     * 获取活跃设备ID
+     * @param airspaceId 空域ID
+     * @return 活跃设备ID列表
+     */
+    public List<String> getActiveDeviceIds(String airspaceId) {
+        validateAirspaceExists(airspaceId);
+        Airspace airspace = airspaceRepository.findById(airspaceId)
+            .orElseThrow(() -> new RuntimeException("空域不存在 " + airspaceId));
+        return airspace.getProbeDevices().values().stream().filter(ProbeDevice::isActive).map(ProbeDevice::getId).collect(Collectors.toList());
     }
 
     /**
@@ -299,7 +331,7 @@ public class DeviceManagementAppService {
      * @param deviceParams 设备参数
      * @return 设备实例
      */
-    private AbstractProbeDevice createDevice(DeviceInitParamsDTO deviceParams) {
+    private ProbeDevice createDevice(DeviceInitParamsDTO deviceParams) {
         String deviceId = UUID.randomUUID().toString();
         Position position = new Position(
                 deviceParams.getPosition().getX(),
@@ -326,7 +358,7 @@ public class DeviceManagementAppService {
      */
     private void validateAirspaceExists(String airspaceId) {
         if (!airspaceRepository.existsById(airspaceId)) {
-            throw new RuntimeException("空域不存�? " + airspaceId);
+            throw new RuntimeException("空域不存在 " + airspaceId);
         }
     }
 
@@ -403,7 +435,7 @@ public class DeviceManagementAppService {
      * @param device 设备
      * @return 设备详情DTO
      */
-    private DeviceDetailsDTO convertToDeviceDetailsDTO(AbstractProbeDevice device) {
+    private DeviceDetailsDTO convertToDeviceDetailsDTO(ProbeDevice device) {
         DeviceDetailsDTO dto = new DeviceDetailsDTO();
         dto.setId(device.getId());
         dto.setType(device.getType());

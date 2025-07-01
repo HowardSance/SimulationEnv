@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 全局异常处理�?
+ * 全局异常处理
  * 统一处理REST API异常
  *
  * @author JP Team
@@ -113,9 +113,9 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 处理资源未找到异�?
+     * 处理资源未找到异常
      *
-     * @param ex 资源未找到异�?
+     * @param ex 资源未找到异常
      * @return 错误响应
      */
     @ExceptionHandler(ResourceNotFoundException.class)
@@ -152,7 +152,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
         Map<String, Object> errors = new HashMap<>();
         errors.put("code", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        errors.put("message", "服务器内部错�?);
+        errors.put("message", "服务器内部错误");
 
         // 在开发环境下可以返回详细错误信息
         if (isDevelopmentMode()) {
@@ -164,9 +164,9 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 判断是否为开发模�?
+     * 判断是否为开发模式
      *
-     * @return 是否为开发模�?
+     * @return 是否为开发模式
      */
     private boolean isDevelopmentMode() {
         String profile = System.getProperty("spring.profiles.active");
@@ -174,7 +174,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 业务异常�?
+     * 业务异常类
      */
     public static class BusinessException extends RuntimeException {
         public BusinessException(String message) {
@@ -196,7 +196,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 权限不足异常�?
+     * 权限不足异常类
      */
     public static class UnauthorizedException extends RuntimeException {
         public UnauthorizedException(String message) {

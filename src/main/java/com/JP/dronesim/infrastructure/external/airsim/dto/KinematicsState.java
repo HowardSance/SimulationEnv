@@ -1,6 +1,7 @@
 package com.JP.dronesim.infrastructure.external.airsim.dto;
 
 import com.JP.dronesim.infrastructure.messaging.serialization.AirSimRpcMessageTrait;
+
 import org.msgpack.annotation.Message;
 
 /**
@@ -9,37 +10,37 @@ import org.msgpack.annotation.Message;
  */
 @Message
 public class KinematicsState extends AirSimRpcMessageTrait {
-    
+
     /**
      * 位置信息
      */
     public Vector3r position;
-    
+
     /**
      * 姿态信息（四元数）
      */
     public Quaternionr orientation;
-    
+
     /**
      * 线性速度
      */
     public Vector3r linear_velocity;
-    
+
     /**
      * 角速度
      */
     public Vector3r angular_velocity;
-    
+
     /**
      * 线性加速度
      */
     public Vector3r linear_acceleration;
-    
+
     /**
      * 角加速度
      */
     public Vector3r angular_acceleration;
-    
+
     /**
      * 默认构造函数
      */
@@ -51,7 +52,7 @@ public class KinematicsState extends AirSimRpcMessageTrait {
         this.linear_acceleration = new Vector3r();
         this.angular_acceleration = new Vector3r();
     }
-    
+
     /**
      * 构造函数
      * @param position 位置
@@ -71,7 +72,7 @@ public class KinematicsState extends AirSimRpcMessageTrait {
         this.linear_acceleration = linearAcceleration != null ? linearAcceleration : new Vector3r();
         this.angular_acceleration = angularAcceleration != null ? angularAcceleration : new Vector3r();
     }
-    
+
     /**
      * 获取位姿信息
      * @return 位姿对象
@@ -79,7 +80,7 @@ public class KinematicsState extends AirSimRpcMessageTrait {
     public Pose getPose() {
         return new Pose(position, orientation);
     }
-    
+
     /**
      * 获取速度大小
      * @return 速度大小
@@ -87,7 +88,7 @@ public class KinematicsState extends AirSimRpcMessageTrait {
     public float getSpeed() {
         return linear_velocity != null ? linear_velocity.magnitude() : 0.0f;
     }
-    
+
     /**
      * 获取加速度大小
      * @return 加速度大小
@@ -95,7 +96,7 @@ public class KinematicsState extends AirSimRpcMessageTrait {
     public float getAccelerationMagnitude() {
         return linear_acceleration != null ? linear_acceleration.magnitude() : 0.0f;
     }
-    
+
     /**
      * 获取角速度大小
      * @return 角速度大小
@@ -103,7 +104,7 @@ public class KinematicsState extends AirSimRpcMessageTrait {
     public float getAngularSpeed() {
         return angular_velocity != null ? angular_velocity.magnitude() : 0.0f;
     }
-    
+
     /**
      * 判断是否处于静止状态
      * @param threshold 速度阈值
@@ -112,7 +113,7 @@ public class KinematicsState extends AirSimRpcMessageTrait {
     public boolean isStationary(float threshold) {
         return getSpeed() < threshold && getAngularSpeed() < threshold;
     }
-    
+
     /**
      * 判断是否处于静止状态（使用默认阈值0.1）
      * @return 是否静止
@@ -120,7 +121,7 @@ public class KinematicsState extends AirSimRpcMessageTrait {
     public boolean isStationary() {
         return isStationary(0.1f);
     }
-    
+
     /**
      * 克隆运动学状态
      * @return 运动学状态副本
@@ -135,7 +136,7 @@ public class KinematicsState extends AirSimRpcMessageTrait {
             new Vector3r(angular_acceleration.x, angular_acceleration.y, angular_acceleration.z)
         );
     }
-    
+
     @Override
     public String toString() {
         return String.format("KinematicsState(position=%s, orientation=%s, speed=%.3f, angular_speed=%.3f)",
@@ -144,4 +145,4 @@ public class KinematicsState extends AirSimRpcMessageTrait {
                            getSpeed(),
                            getAngularSpeed());
     }
-} 
+}

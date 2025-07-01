@@ -28,7 +28,7 @@ src/main/java/com/JP/dronesim/
 ├── application/                    # 应用层
 │   ├── services/                   # 应用服务
 │   │   ├── AirspaceManagementAppService.java    # 空域管理应用服务
-│   │   ├── DeviceManagementAppService.java      # 设备管理应用服务  
+│   │   ├── DeviceManagementAppService.java      # 设备管理应用服务
 │   │   ├── UAVManagementAppService.java         # 无人机管理应用服务
 │   │   ├── SimulationAppService.java            # 仿真控制应用服务
 │   │   └── QueryAppService.java                 # 查询应用服务
@@ -325,7 +325,7 @@ public class DeviceStatusUpdateEvent extends DomainEvent {
 // 在device聚合中添加新的设备实体
 public class InfraredCamera extends ProbeDevice {
     private InfraredParameters parameters;
-    
+
     @Override
     public DetectionResult detect(UAV target) {
         // 红外检测算法实现
@@ -404,4 +404,4 @@ public class AdvancedDetectionService implements DetectionService {
 - 业务异常分类
 - 错误恢复机制
 
-本架构设计确保了系统的可维护性、可扩展性和业务逻辑的清晰表达，为无人机探测仿真系统提供了坚实的技术基础。 
+本架构设计确保了系统的可维护性、可扩展性和业务逻辑的清晰表达，为无人机探测仿真系统提供了坚实的技术基础。

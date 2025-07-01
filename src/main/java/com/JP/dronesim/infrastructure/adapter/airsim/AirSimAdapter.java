@@ -22,21 +22,21 @@ import java.util.List;
  */
 @Component
 public class AirSimAdapter implements SimulationEnginePort, DeviceControlPort, SensorDataPort {
-    
+
     private final DroneClientInterface droneClient;
     private final SensorClientInterface sensorClient;
     private final AirSimConnectionConfig connectionConfig;
-    
+
     /**
      * 已部署的设备映射
      */
     private final Map<String, String> deployedDevices = new ConcurrentHashMap<>();
-    
+
     /**
      * 连接状态
      */
     private volatile boolean connected = false;
-    
+
     public AirSimAdapter(DroneClientInterface droneClient, 
                         SensorClientInterface sensorClient,
                         AirSimConnectionConfig connectionConfig) {
@@ -44,37 +44,37 @@ public class AirSimAdapter implements SimulationEnginePort, DeviceControlPort, S
         this.sensorClient = sensorClient;
         this.connectionConfig = connectionConfig;
     }
-    
+
     // ==================== SimulationEnginePort 实现 ====================
-    
+
     @Override
     public void initializeConnection(String host, int port) {
         try {
             // 初始化客户端连接
             droneClient.initialize(host, port);
             sensorClient.initialize(host, port);
-            
+
             // 确认连接
             droneClient.confirmConnection();
-            
+
             this.connected = true;
-            
+
             // 启用API控制
             droneClient.enableApiControl(true);
-            
+
         } catch (Exception e) {
             this.connected = false;
             throw new RuntimeException("连接AirSim失败: " + e.getMessage(), e);
         }
     }
-    
+
     @Override
     public void shutdown() {
         try {
             if (connected) {
                 // 禁用API控制
                 droneClient.enableApiControl(false);
-                
+
                 // 关闭连接
                 droneClient.shutdown();
                 sensorClient.shutdown();
@@ -87,13 +87,13 @@ public class AirSimAdapter implements SimulationEnginePort, DeviceControlPort, S
             deployedDevices.clear();
         }
     }
-    
+
     @Override
     public void resetSimulation() {
         if (!connected) {
             throw new IllegalStateException("未连接到AirSim");
         }
-        
+
         try {
             droneClient.reset();
             deployedDevices.clear();
@@ -101,36 +101,36 @@ public class AirSimAdapter implements SimulationEnginePort, DeviceControlPort, S
             throw new RuntimeException("重置仿真环境失败: " + e.getMessage(), e);
         }
     }
-    
+
     @Override
     public void setTimeScale(double scaleFactor) {
         if (!connected) {
             throw new IllegalStateException("未连接到AirSim");
         }
-        
+
         // AirSim可能不直接支持时间缩放，这里记录请求
         System.out.println("设置时间缩放因子: " + scaleFactor);
     }
-    
+
     @Override
     public void pauseSimulation() {
         if (!connected) {
             throw new IllegalStateException("未连接到AirSim");
         }
-        
+
         try {
             droneClient.simPause(true);
         } catch (Exception e) {
             throw new RuntimeException("暂停仿真失败: " + e.getMessage(), e);
         }
     }
-    
+
     @Override
     public void resumeSimulation() {
         if (!connected) {
             throw new IllegalStateException("未连接到AirSim");
         }
-        
+
         try {
             droneClient.simPause(false);
         } catch (Exception e) {

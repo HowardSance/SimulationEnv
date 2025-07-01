@@ -12,7 +12,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 /**
- * 设备管理REST控制�?
+ * 设备管理REST控制�?
  * 处理探测设备的部署、删除、修改等操作
  *
  * @author JP Team
@@ -29,7 +29,7 @@ public class DeviceController {
      * 部署探测设备
      *
      * @param airspaceId 空域ID
-     * @param deviceParams 设备初始化参�?
+     * @param deviceParams 设备初始化参�?
      * @return 设备详情
      */
     @PostMapping
@@ -83,7 +83,7 @@ public class DeviceController {
     }
 
     /**
-     * 获取空域内所有设�?
+     * 获取空域内所有设�?
      *
      * @param airspaceId 空域ID
      * @return 设备列表
@@ -139,11 +139,11 @@ public class DeviceController {
     }
 
     /**
-     * 激活设�?
+     * 激活设�?
      *
      * @param airspaceId 空域ID
      * @param deviceId 设备ID
-     * @return 激活结�?
+     * @return 激活结�?
      */
     @PostMapping("/{deviceId}/activate")
     public ResponseEntity<String> activateDevice(
@@ -151,7 +151,7 @@ public class DeviceController {
             @PathVariable String deviceId) {
         try {
             deviceManagementAppService.activateDevice(airspaceId, deviceId);
-            return ResponseEntity.ok("设备激活成�?);
+            return ResponseEntity.ok("Device activated successfully");
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }

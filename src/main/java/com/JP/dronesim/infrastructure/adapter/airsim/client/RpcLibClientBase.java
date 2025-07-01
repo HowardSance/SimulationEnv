@@ -21,7 +21,7 @@ public interface RpcLibClientBase {
 	 * 用于验证客户端与服务器的连接状态
 	 */
 	public void confirmConnection();
-	
+
 	/**
 	 * 重置仿真环境
 	 * 将仿真器恢复到初始状态

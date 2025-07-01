@@ -12,7 +12,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 /**
- * 空域管理REST控制�?
+ * 空域管理REST控制�?
  * 处理空域创建、加载、保存、查询等操作
  *
  * @author JP Team
@@ -90,7 +90,7 @@ public class AirspaceController {
     }
 
     /**
-     * 获取所有空域列�?
+     * 获取所有空域列表
      *
      * @return 空域列表
      */
