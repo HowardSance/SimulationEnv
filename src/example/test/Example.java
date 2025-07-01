@@ -15,11 +15,10 @@ import messages.DistanceSensorData;
 
 
 public class Example {
-	
 	public static void main(String[] args) throws UnknownHostException {
 		EventLoop loop = EventLoop.defaultEventLoop();
 		Client client = new Client("127.0.0.1", 41451, loop);
-		
+
 		CarClientInterface carclient = client.proxy(CarClientInterface.class);
 
 		//Enable the API to control the car
@@ -32,19 +31,17 @@ public class Example {
 		//Disable API
 		carclient.enableApiControl(true, "");
 
-		
+
 		while(true) {
 			//Get the car state of vehicle with no name
 			CarState cs = carclient.getCarState("");
 			//Get the distance sensor data of vehicle with no name
 			DistanceSensorData ds = carclient.getDistanceSensorData("", "");
-	
+
 			System.out.println(cs.speed);
 			System.out.println(ds.distance);
 		}
-		
-		
-		
+
 	}
-	
+
 }

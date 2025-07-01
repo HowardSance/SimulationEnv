@@ -15,46 +15,26 @@ import java.util.UUID;
 /**
  * 无人机聚合根
  * 无人机作为被探测目标，其移动和特征生成是仿真的关键
- * 
+ *
  * @author JP Team
  * @version 1.0
  */
 public class UAV {
-    
+
     /**
      * 设备唯一标识符
      */
     private final String id;
-    
+
     /**
      * 无人机名称
      */
     private String name;
     
     /**
-     * 位置：表示实体在NED坐标系中的三维位置 (x, y, z)
+     * 无人机当前状态（包含运动状态和物理特性）
      */
-    private Position position;
-    
-    /**
-     * 姿态：表示实体的三维姿态（四元数或欧拉角）
-     */
-    private Orientation orientation;
-    
-    /**
-     * 速度：表示无人机在NED坐标系中的三维速度 (vx, vy, vz)
-     */
-    private Velocity velocity;
-    
-    /**
-     * 加速度：表示无人机在NED坐标系中的三维加速度 (ax, ay, az)
-     */
-    private Acceleration acceleration;
-    
-    /**
-     * 物理材质：描述无人机的材质特征（电磁波反射）
-     */
-    private PhysicalProperties physicalProperties;
+    private UAVState currentState;
     
     /**
      * 飞行路径：无人机的飞行路径，航点列表
@@ -97,31 +77,28 @@ public class UAV {
     private double batteryLevel;
     
     /**
+     * 无线电频率（MHz）
+     */
+    private double radioFrequency;
+    
+    /**
      * 构造函数
      * 
      * @param name 无人机名称
-     * @param initialPosition 初始位置
-     * @param physicalProperties 物理特性
+     * @param initialState 初始状态（包含位置和物理特性）
      */
-    public UAV(String name, Position initialPosition, PhysicalProperties physicalProperties) {
+    public UAV(String name, UAVState initialState) {
         // 参数验证
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("无人机名称不能为空");
         }
-        if (initialPosition == null) {
-            throw new IllegalArgumentException("初始位置不能为空");
-        }
-        if (physicalProperties == null) {
-            throw new IllegalArgumentException("物理特性不能为空");
+        if (initialState == null) {
+            throw new IllegalArgumentException("初始状态不能为空");
         }
         
         this.id = UUID.randomUUID().toString();
         this.name = name.trim();
-        this.position = initialPosition;
-        this.orientation = Orientation.identity(); // 初始姿态为无旋转
-        this.velocity = Velocity.zero(); // 初始速度为零
-        this.acceleration = Acceleration.zero(); // 初始加速度为零
-        this.physicalProperties = physicalProperties;
+        this.currentState = initialState;
         this.flightPath = new ArrayList<>();
         this.currentWaypointIndex = 0;
         this.status = UAVStatus.STANDBY;
@@ -130,6 +107,22 @@ public class UAV {
         this.maxSpeed = 20.0; // 默认最大速度20 m/s
         this.maxAcceleration = 5.0; // 默认最大加速度5 m/s²
         this.batteryLevel = 100.0; // 初始电量100%
+        this.radioFrequency = 2400.0; // 默认频率2.4GHz
+    }
+    
+    /**
+     * 兼容性构造函数 - 使用位置创建标准小型无人机
+     * 
+     * @param name 无人机名称
+     * @param initialPosition 初始位置
+     */
+    public UAV(String name, Position initialPosition) {
+        this(name, UAVState.createStandardSmallDrone(
+            initialPosition, 
+            Orientation.identity(), 
+            Velocity.zero(), 
+            Acceleration.zero()
+        ));
     }
     
     /**
@@ -147,10 +140,7 @@ public class UAV {
         }
         
         // 设置初始状态
-        this.position = initialState.getPosition();
-        this.orientation = initialState.getOrientation();
-        this.velocity = initialState.getVelocity();
-        this.acceleration = initialState.getAcceleration();
+        this.currentState = initialState;
         
         // 设置飞行路径
         this.flightPath = new ArrayList<>(mission.getWaypoints());
@@ -182,15 +172,15 @@ public class UAV {
         }
         
         // 计算到目标位置的方向和距离
-        double distance = position.distanceTo(targetLocation);
+        double distance = currentState.getPosition().distanceTo(targetLocation);
         if (distance < 0.1) { // 已经很接近目标位置
             return;
         }
         
         // 计算方向向量
-        double dx = targetLocation.getX() - position.getX();
-        double dy = targetLocation.getY() - position.getY();
-        double dz = targetLocation.getZ() - position.getZ();
+        double dx = targetLocation.getX() - currentState.getPosition().getX();
+        double dy = targetLocation.getY() - currentState.getPosition().getY();
+        double dz = targetLocation.getZ() - currentState.getPosition().getZ();
         
         // 归一化方向向量
         double norm = Math.sqrt(dx * dx + dy * dy + dz * dz);
@@ -198,172 +188,176 @@ public class UAV {
         dy /= norm;
         dz /= norm;
         
-        // 设置目标速度（限制在最大速度内）
-        double targetSpeed = Math.min(maxSpeed, distance * 0.5); // 根据距离调整速度
-        this.velocity = new Velocity(dx * targetSpeed, dy * targetSpeed, dz * targetSpeed);
+        // 计算目标速度（考虑最大速度限制）
+        double targetSpeed = Math.min(maxSpeed, distance * 2.0); // 距离越近速度越慢
+        
+        // 设置新的速度
+        Velocity newVelocity = new Velocity(dx * targetSpeed, dy * targetSpeed, dz * targetSpeed);
+        
+        // 计算新朝向
+        double yaw = Math.atan2(dy, dx);
+        Orientation newOrientation = Orientation.fromEulerAngles(0, 0, yaw);
         
         // 更新状态
+        this.currentState = currentState.updateMotionState(
+            currentState.getPosition(), 
+            newOrientation, 
+            newVelocity, 
+            currentState.getAcceleration()
+        );
+        
+        // 更新运行状态
         this.status = UAVStatus.MOVING;
         this.lastUpdatedAt = LocalDateTime.now();
     }
     
     /**
-     * 根据自身速度、加速度和飞行任务，以及空域环境状态，更新无人机在指定时间步长后的位置和姿态
+     * 根据时间步长更新无人机位置和状态
      * 
-     * @param deltaTime 时间步长
-     * @param environment 当前空域环境对象，用于获取风力等影响因素
+     * @param deltaTime 时间步长（秒）
      */
-    public void move(double deltaTime, AirspaceEnvironment environment) {
+    public void updateState(double deltaTime) {
         if (deltaTime <= 0) {
             throw new IllegalArgumentException("时间步长必须大于零");
         }
-        if (environment == null) {
-            throw new IllegalArgumentException("空域环境不能为空");
-        }
-        if (!canMove()) {
-            return; // 不能移动时直接返回
-        }
-        
-        // 获取环境影响
-        Velocity windEffect = environment.getWindVelocity();
-        Acceleration gravityEffect = Acceleration.gravity();
-        
-        // 计算总加速度（包括环境影响）
-        Acceleration totalAcceleration = acceleration.add(gravityEffect);
-        
-        // 限制加速度
-        totalAcceleration = totalAcceleration.limit(maxAcceleration);
-        
-        // 更新速度
-        Velocity velocityDelta = totalAcceleration.toVelocityDelta(deltaTime);
-        this.velocity = velocity.add(velocityDelta).add(windEffect);
-        
-        // 限制速度
-        this.velocity = velocity.limit(maxSpeed);
         
         // 更新位置
+        Velocity velocity = currentState.getVelocity();
+        Position position = currentState.getPosition();
         double newX = position.getX() + velocity.getVx() * deltaTime;
         double newY = position.getY() + velocity.getVy() * deltaTime;
         double newZ = position.getZ() + velocity.getVz() * deltaTime;
-        this.position = new Position(newX, newY, newZ);
+        Position newPosition = new Position(newX, newY, newZ);
         
-        // 更新姿态（根据速度方向）
-        updateOrientationFromVelocity();
+        // 更新速度（考虑加速度）
+        Velocity newVelocity = velocity;
+        Acceleration acceleration = currentState.getAcceleration();
+        if (!acceleration.isZero()) {
+            double newVx = velocity.getVx() + acceleration.getAx() * deltaTime;
+            double newVy = velocity.getVy() + acceleration.getAy() * deltaTime;
+            double newVz = velocity.getVz() + acceleration.getAz() * deltaTime;
+            
+            // 限制最大速度
+            double speed = Math.sqrt(newVx * newVx + newVy * newVy + newVz * newVz);
+            if (speed > maxSpeed) {
+                double scale = maxSpeed / speed;
+                newVx *= scale;
+                newVy *= scale;
+                newVz *= scale;
+            }
+            
+            newVelocity = new Velocity(newVx, newVy, newVz);
+        }
         
-        // 检查是否到达当前目标航点
+        // 更新状态
+        this.currentState = currentState.updateMotionState(
+            newPosition, 
+            currentState.getOrientation(), 
+            newVelocity, 
+            acceleration
+        );
+        
+        // 检查是否到达航点
         checkWaypointReached();
         
-        // 消耗电量
+        // 消耗电池
         consumeBattery(deltaTime);
         
         // 更新时间戳
         this.lastUpdatedAt = LocalDateTime.now();
-        
-        // 验证状态
-        validateState();
     }
     
     /**
-     * 更新无人机的状态，如被探测、受损、故障等
+     * 更新无人机状态
      * 
-     * @param newStatus UAVStatus 枚举值，表示无人机的新状态
+     * @param newStatus 新状态
      */
     public void updateStatus(UAVStatus newStatus) {
         if (newStatus == null) {
-            throw new IllegalArgumentException("新状态不能为空");
+            throw new IllegalArgumentException("状态不能为空");
         }
         
         UAVStatus oldStatus = this.status;
         this.status = newStatus;
         this.lastUpdatedAt = LocalDateTime.now();
         
-        // 状态变化时的特殊处理
+        // 处理状态变化
         handleStatusChange(oldStatus, newStatus);
     }
-    
-    /**
-     * 获取无人机当前的物理特征签名，供探测设备进行探测计算
-     * 
-     * @return PhysicalSignature：包含当前RCS、光学特征、无线电发射功率等
-     */
-    public PhysicalSignature getPhysicalSignature() {
-        return new PhysicalSignature(
-            physicalProperties.getRadarCrossSection(),
-            physicalProperties.getOpticalVisibility(),
-            physicalProperties.getRadioEmissionPower(),
-            physicalProperties.getInfraredSignature(),
-            position,
-            velocity.getMagnitude(),
-            status
-        );
-    }
-    
+
     // Getter方法
     public String getId() {
         return id;
     }
-    
+
     public String getName() {
         return name;
     }
-    
+
     public Position getPosition() {
-        return position;
+        return currentState.getPosition();
     }
-    
+
     public Orientation getOrientation() {
-        return orientation;
+        return currentState.getOrientation();
     }
-    
+
     public Velocity getVelocity() {
-        return velocity;
+        return currentState.getVelocity();
     }
-    
+
     public Acceleration getAcceleration() {
-        return acceleration;
+        return currentState.getAcceleration();
     }
-    
-    public PhysicalProperties getPhysicalProperties() {
-        return physicalProperties;
+
+    public UAVState getCurrentState() {
+        return currentState;
     }
-    
+
     public List<Waypoint> getFlightPath() {
         return Collections.unmodifiableList(flightPath);
     }
-    
+
     public UAVStatus getStatus() {
         return status;
     }
-    
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
-    
+
     public LocalDateTime getLastUpdatedAt() {
         return lastUpdatedAt;
     }
-    
+
     public double getMaxSpeed() {
         return maxSpeed;
     }
-    
+
     public double getMaxAcceleration() {
         return maxAcceleration;
     }
-    
+
     public double getBatteryLevel() {
         return batteryLevel;
     }
-    
+
+    public double getRadioFrequency() {
+        return radioFrequency;
+    }
+
+    /**
+     * 获取当前航点
+     * 
+     * @return 当前航点，如果没有航点返回null
+     */
     public Waypoint getCurrentWaypoint() {
         if (flightPath.isEmpty() || currentWaypointIndex >= flightPath.size()) {
             return null;
         }
         return flightPath.get(currentWaypointIndex);
     }
-    
-    // 业务方法
-    
+
     /**
      * 设置飞行路径
      * 
@@ -373,164 +367,200 @@ public class UAV {
         if (waypoints == null) {
             throw new IllegalArgumentException("航点列表不能为空");
         }
+        
         this.flightPath = new ArrayList<>(waypoints);
         this.currentWaypointIndex = 0;
         this.lastUpdatedAt = LocalDateTime.now();
     }
-    
+
     /**
-     * 添加航点到飞行路径
+     * 添加航点
      * 
-     * @param waypoint 航点
+     * @param waypoint 要添加的航点
      */
     public void addWaypoint(Waypoint waypoint) {
         if (waypoint == null) {
             throw new IllegalArgumentException("航点不能为空");
         }
+        
         this.flightPath.add(waypoint);
         this.lastUpdatedAt = LocalDateTime.now();
     }
-    
+
     /**
-     * 开始执行飞行任务
+     * 开始执行任务
      */
     public void startMission() {
         if (flightPath.isEmpty()) {
             throw new IllegalStateException("没有设置飞行路径");
         }
-        if (!status.canAcceptCommands()) {
-            throw new IllegalStateException("无人机当前状态不允许开始任务：" + status);
+        if (batteryLevel < 10.0) {
+            throw new IllegalStateException("电池电量不足，无法开始任务");
         }
         
-        this.status = UAVStatus.TAKING_OFF;
         this.currentWaypointIndex = 0;
+        this.status = UAVStatus.MOVING;
         this.lastUpdatedAt = LocalDateTime.now();
     }
-    
+
     /**
-     * 暂停当前任务
+     * 暂停任务
      */
     public void pauseMission() {
-        if (status.isMoving()) {
+        if (status == UAVStatus.MOVING) {
             this.status = UAVStatus.HOVERING;
-            this.velocity = Velocity.zero();
+            this.currentState = currentState.updateMotionState(
+                currentState.getPosition(),
+                currentState.getOrientation(),
+                Velocity.zero(),
+                Acceleration.zero()
+            );
             this.lastUpdatedAt = LocalDateTime.now();
         }
     }
-    
+
     /**
      * 恢复任务
      */
     public void resumeMission() {
-        if (status == UAVStatus.HOVERING && !flightPath.isEmpty()) {
+        if (status == UAVStatus.HOVERING) {
             this.status = UAVStatus.MOVING;
             this.lastUpdatedAt = LocalDateTime.now();
         }
     }
-    
+
     /**
-     * 返航
+     * 返回起始点
      */
     public void returnToHome() {
-        this.status = UAVStatus.RETURNING;
-        // 可以添加返航逻辑，比如设置返航航点
-        this.lastUpdatedAt = LocalDateTime.now();
+        if (!flightPath.isEmpty()) {
+            Waypoint homeWaypoint = flightPath.get(0);
+            move(homeWaypoint.getPosition());
+        }
     }
-    
+
     /**
      * 紧急降落
      */
     public void emergencyLanding() {
         this.status = UAVStatus.LANDING;
-        this.velocity = new Velocity(0, 0, 2.0); // 垂直降落
+        this.currentState = currentState.updateMotionState(
+            currentState.getPosition(),
+            currentState.getOrientation(),
+            new Velocity(0, 0, 5.0), // 垂直下降
+            Acceleration.zero()
+        );
         this.lastUpdatedAt = LocalDateTime.now();
     }
-    
-    // 私有辅助方法
-    
+
     /**
      * 检查是否可以移动
+     * 
+     * @return 是否可以移动
      */
     private boolean canMove() {
-        return status.canAcceptCommands() && batteryLevel > 10.0;
+        return status == UAVStatus.STANDBY || status == UAVStatus.MOVING || status == UAVStatus.HOVERING;
     }
-    
+
     /**
-     * 根据速度方向更新姿态
-     */
-    private void updateOrientationFromVelocity() {
-        if (!velocity.isStationary()) {
-            double yaw = velocity.getDirection();
-            double pitch = Math.atan2(-velocity.getVz(), velocity.getHorizontalMagnitude());
-            this.orientation = Orientation.fromEulerAngles(0, pitch, yaw);
-        }
-    }
-    
-    /**
-     * 检查是否到达当前航点
+     * 检查是否到达航点
      */
     private void checkWaypointReached() {
         Waypoint currentWaypoint = getCurrentWaypoint();
-        if (currentWaypoint != null && currentWaypoint.isNearby(position)) {
-            currentWaypoint.markAsReached();
-            currentWaypointIndex++;
-            
-            // 检查是否完成所有航点
-            if (currentWaypointIndex >= flightPath.size()) {
-                this.status = UAVStatus.HOVERING; // 任务完成，悬停
+        if (currentWaypoint != null) {
+            double distance = currentState.getPosition().distanceTo(currentWaypoint.getPosition());
+            if (distance < 1.0) { // 1米容差
+                currentWaypoint.markAsReached();
+                currentWaypointIndex++;
+                
+                if (currentWaypointIndex >= flightPath.size()) {
+                    // 任务完成
+                    this.status = UAVStatus.LANDED;
+                    this.currentState = currentState.updateMotionState(
+                        currentState.getPosition(),
+                        currentState.getOrientation(),
+                        Velocity.zero(),
+                        Acceleration.zero()
+                    );
+                }
             }
         }
     }
-    
+
     /**
-     * 消耗电量
+     * 消耗电池电量
+     * 
+     * @param deltaTime 时间步长
      */
     private void consumeBattery(double deltaTime) {
-        // 根据速度和加速度计算电量消耗
-        double speedFactor = velocity.getMagnitude() / maxSpeed;
-        double accelerationFactor = acceleration.getMagnitude() / maxAcceleration;
-        double consumptionRate = 0.1 + speedFactor * 0.2 + accelerationFactor * 0.1; // 每秒消耗百分比
+        if (status == UAVStatus.MOVING) {
+            // 移动时消耗更多电量
+            double consumption = deltaTime * 0.1; // 每秒消耗0.1%
+            this.batteryLevel = Math.max(0, batteryLevel - consumption);
+        } else if (status == UAVStatus.HOVERING) {
+            // 悬停时消耗较少电量
+            double consumption = deltaTime * 0.05; // 每秒消耗0.05%
+            this.batteryLevel = Math.max(0, batteryLevel - consumption);
+        }
         
-        this.batteryLevel = Math.max(0, batteryLevel - consumptionRate * deltaTime);
-        
-        // 电量不足时更新状态
-        if (batteryLevel < 20.0 && status != UAVStatus.LOW_BATTERY) {
+        // 低电量自动返航
+        if (batteryLevel < 20.0 && status != UAVStatus.LANDING && status != UAVStatus.LANDED) {
             this.status = UAVStatus.LOW_BATTERY;
+            returnToHome();
         }
     }
-    
+
     /**
      * 处理状态变化
+     * 
+     * @param oldStatus 旧状态
+     * @param newStatus 新状态
      */
     private void handleStatusChange(UAVStatus oldStatus, UAVStatus newStatus) {
-        // 状态变化时的特殊逻辑
-        if (newStatus == UAVStatus.MALFUNCTION || newStatus == UAVStatus.DAMAGED) {
-            // 故障或受损时停止移动
-            this.velocity = Velocity.zero();
-            this.acceleration = Acceleration.zero();
-        } else if (newStatus == UAVStatus.LANDING) {
-            // 降落时设置向下速度
-            this.velocity = new Velocity(0, 0, 2.0);
-        } else if (newStatus == UAVStatus.LANDED) {
-            // 已降落时停止所有运动
-            this.velocity = Velocity.zero();
-            this.acceleration = Acceleration.zero();
+        switch (newStatus) {
+            case STANDBY:
+                this.currentState = currentState.updateMotionState(
+                    currentState.getPosition(),
+                    currentState.getOrientation(),
+                    Velocity.zero(),
+                    Acceleration.zero()
+                );
+                break;
+            case HOVERING:
+                this.currentState = currentState.updateMotionState(
+                    currentState.getPosition(),
+                    currentState.getOrientation(),
+                    Velocity.zero(),
+                    Acceleration.zero()
+                );
+                break;
+            case MALFUNCTION:
+                // 故障状态下的处理
+                this.currentState = currentState.updateMotionState(
+                    currentState.getPosition(),
+                    currentState.getOrientation(),
+                    Velocity.zero(),
+                    Acceleration.zero()
+                );
+                break;
+            default:
+                // 其他状态的处理
+                break;
         }
     }
-    
+
     /**
-     * 验证状态一致性
+     * 验证无人机状态
      */
     private void validateState() {
-        if (batteryLevel < 0 || batteryLevel > 100) {
-            throw new IllegalStateException("电池电量超出有效范围：" + batteryLevel);
+        if (currentState == null) {
+            throw new IllegalStateException("无人机状态不能为空");
         }
-        if (position.getZ() < 0) {
-            // 地面以下，设置为地面
-            this.position = new Position(position.getX(), position.getY(), 0);
+        if (batteryLevel < 0 || batteryLevel > 100) {
+            throw new IllegalStateException("电池电量必须在0-100之间");
         }
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -538,18 +568,15 @@ public class UAV {
         UAV uav = (UAV) obj;
         return Objects.equals(id, uav.id);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(id);
     }
-    
+
     @Override
     public String toString() {
         return String.format("UAV{id='%s', name='%s', position=%s, status=%s, battery=%.1f%%}",
-                           id, name, position, status, batteryLevel);
-    }
-
-    public double getRadioFrequency() {
+                           id, name, currentState.getPosition(), status, batteryLevel);
     }
 } 

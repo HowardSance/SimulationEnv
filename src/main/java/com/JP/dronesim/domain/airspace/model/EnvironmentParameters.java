@@ -4,84 +4,84 @@ package com.JP.dronesim.domain.airspace.model;
  * 环境参数值对象
  * 封装天气、温度、风向量、光照、能见度等环境属性
  * 影响探测设备的探测效果
- * 
+ *
  * @author JP
  * @version 1.0
  */
 public class EnvironmentParameters {
-    
+
     /**
      * 环境温度（摄氏度）
      */
     private final double temperature;
-    
+
     /**
      * 相对湿度（0.0-1.0）
      */
     private final double humidity;
-    
+
     /**
      * 风速（米/秒）
      */
     private final double windSpeed;
-    
+
     /**
      * 风向（度，0-360）
      */
     private final double windDirection;
-    
+
     /**
      * 大气压力（帕斯卡）
      */
     private final double atmosphericPressure;
-    
+
     /**
      * 能见度（米）
      */
     private final double visibility;
-    
+
     /**
      * 环境光照强度（0.0-1.0）
      * 0.0表示完全黑暗，1.0表示最亮的日光
      */
     private final double lightIntensity;
-    
+
     /**
      * 太阳高度角（度，-90到90）
      * 负值表示太阳在地平线以下
      */
     private final double sunElevation;
-    
+
     /**
      * 太阳方位角（度，0-360）
      */
     private final double sunAzimuth;
-    
+
     /**
      * 云层覆盖率（0.0-1.0）
      * 0.0表示晴空，1.0表示完全阴天
      */
     private final double cloudCover;
-    
+
     /**
      * 降水强度（毫米/小时）
      */
     private final double precipitationRate;
-    
+
     /**
      * 大气透明度（0.0-1.0）
      * 影响光线传播和图像质量
      */
     private final double atmosphericClarity;
-    
+
     /**
      * 是否为夜间模式
      */
     private final boolean isNightTime;
-    
+
     /**
      * 构造函数
-     * 
+     *
      * @param temperature 环境温度
      * @param humidity 相对湿度
      * @param windSpeed 风速
@@ -96,11 +96,7 @@ public class EnvironmentParameters {
      * @param atmosphericClarity 大气透明度
      * @param isNightTime 是否夜间
      */
-    public EnvironmentParameters(double temperature, double humidity, double windSpeed,
-                               double windDirection, double atmosphericPressure, double visibility,
-                               double lightIntensity, double sunElevation, double sunAzimuth,
-                               double cloudCover, double precipitationRate, double atmosphericClarity,
-                               boolean isNightTime) {
+    public EnvironmentParameters(double temperature, double humidity, double windSpeed, double windDirection, double atmosphericPressure, double visibility, double lightIntensity, double sunElevation, double sunAzimuth, double cloudCover, double precipitationRate, double atmosphericClarity, boolean isNightTime) {
         this.temperature = temperature;
         this.humidity = humidity;
         this.windSpeed = windSpeed;
@@ -114,11 +110,11 @@ public class EnvironmentParameters {
         this.precipitationRate = precipitationRate;
         this.atmosphericClarity = atmosphericClarity;
         this.isNightTime = isNightTime;
-        
+
         // 参数验证
         validateParameters();
     }
-    
+
     /**
      * 验证参数有效性
      */
@@ -154,212 +150,212 @@ public class EnvironmentParameters {
             throw new IllegalArgumentException("大气透明度必须在0.0到1.0之间");
         }
     }
-    
+
     /**
      * 获取环境温度
-     * 
+     *
      * @return 环境温度（摄氏度）
      */
     public double getTemperature() {
         return temperature;
     }
-    
+
     /**
      * 获取相对湿度
-     * 
+     *
      * @return 相对湿度（0.0-1.0）
      */
     public double getHumidity() {
         return humidity;
     }
-    
+
     /**
      * 获取风速
-     * 
+     *
      * @return 风速（米/秒）
      */
     public double getWindSpeed() {
         return windSpeed;
     }
-    
+
     /**
      * 获取风向
-     * 
+     *
      * @return 风向（度，0-360）
      */
     public double getWindDirection() {
         return windDirection;
     }
-    
+
     /**
      * 获取大气压力
-     * 
+     *
      * @return 大气压力（帕斯卡）
      */
     public double getAtmosphericPressure() {
         return atmosphericPressure;
     }
-    
+
     /**
      * 获取能见度
-     * 
+     *
      * @return 能见度（米）
      */
     public double getVisibility() {
         return visibility;
     }
-    
+
     /**
      * 获取光照强度
-     * 
+     *
      * @return 环境光照强度（0.0-1.0）
      */
     public double getLightIntensity() {
         return lightIntensity;
     }
-    
+
     /**
      * 获取太阳高度角
-     * 
+     *
      * @return 太阳高度角（度，-90到90）
      */
     public double getSunElevation() {
         return sunElevation;
     }
-    
+
     /**
      * 获取太阳方位角
-     * 
+     *
      * @return 太阳方位角（度，0-360）
      */
     public double getSunAzimuth() {
         return sunAzimuth;
     }
-    
+
     /**
      * 获取云层覆盖率
-     * 
+     *
      * @return 云层覆盖率（0.0-1.0）
      */
     public double getCloudCover() {
         return cloudCover;
     }
-    
+
     /**
      * 获取降水强度
-     * 
+     *
      * @return 降水强度（毫米/小时）
      */
     public double getPrecipitationRate() {
         return precipitationRate;
     }
-    
+
     /**
      * 获取大气透明度
-     * 
+     *
      * @return 大气透明度（0.0-1.0）
      */
     public double getAtmosphericClarity() {
         return atmosphericClarity;
     }
-    
+
     /**
      * 是否为夜间模式
-     * 
+     *
      * @return true表示夜间，false表示白天
      */
     public boolean isNightTime() {
         return isNightTime;
     }
-    
+
     /**
      * 检查光照条件是否良好
-     * 
+     *
      * @return true表示光照条件适合光电摄像头探测
      */
     public boolean hasGoodLightConditions() {
         return lightIntensity >= 0.3 && !isRaining();
     }
-    
+
     /**
      * 检查能见度是否良好
-     * 
+     *
      * @return true表示能见度足够（>=500米）
      */
     public boolean hasGoodVisibility() {
         return visibility >= 500.0;
     }
-    
+
     /**
      * 检查是否正在下雨
-     * 
+     *
      * @return true表示正在下雨（降水强度>0.1mm/h）
      */
     public boolean isRaining() {
         return precipitationRate > 0.1;
     }
-    
+
     /**
      * 检查是否多云
-     * 
+     *
      * @return true表示多云（云层覆盖率>0.5）
      */
     public boolean isCloudy() {
         return cloudCover > 0.5;
     }
-    
+
     /**
      * 检查是否有强风
-     * 
+     *
      * @return true表示强风（风速>10m/s）
      */
     public boolean isWindy() {
         return windSpeed > 10.0;
     }
-    
+
     /**
      * 计算光电摄像头的环境适应性评分
-     * 
+     *
      * @return 环境适应性评分（0.0-1.0），1.0表示最适合
      */
     public double getOpticalDetectionSuitability() {
         double score = 1.0;
-        
+
         // 光照因子
         if (lightIntensity < 0.2) {
             score *= 0.3; // 光线太暗
         } else if (lightIntensity < 0.5) {
             score *= 0.7; // 光线偏暗
         }
-        
+
         // 能见度因子
         if (visibility < 100) {
             score *= 0.2; // 能见度极差
         } else if (visibility < 500) {
             score *= 0.6; // 能见度较差
         }
-        
+
         // 降水因子
         if (precipitationRate > 5.0) {
             score *= 0.3; // 大雨
         } else if (precipitationRate > 1.0) {
             score *= 0.7; // 小雨
         }
-        
+
         // 云层因子
         if (cloudCover > 0.8) {
             score *= 0.8; // 阴天
         }
-        
+
         // 大气透明度因子
         score *= atmosphericClarity;
-        
+
         return Math.max(0.0, Math.min(1.0, score));
     }
-    
+
     /**
      * 创建默认的环境参数（晴朗白天）
-     * 
+     *
      * @return 默认环境参数
      */
     public static EnvironmentParameters createDefault() {
@@ -379,10 +375,10 @@ public class EnvironmentParameters {
                 false    // 白天
         );
     }
-    
+
     /**
      * 创建夜间环境参数
-     * 
+     *
      * @return 夜间环境参数
      */
     public static EnvironmentParameters createNightTime() {
@@ -402,10 +398,10 @@ public class EnvironmentParameters {
                 true     // 夜间
         );
     }
-    
+
     /**
      * 创建恶劣天气环境参数
-     * 
+     *
      * @return 恶劣天气环境参数
      */
     public static EnvironmentParameters createBadWeather() {
@@ -425,7 +421,7 @@ public class EnvironmentParameters {
                 false    // 白天
         );
     }
-    
+
     @Override
     public String toString() {
         return String.format("EnvironmentParameters[temp=%.1f°C, humidity=%.1f%%, " +
@@ -437,14 +433,14 @@ public class EnvironmentParameters {
                            sunElevation, sunAzimuth, cloudCover * 100,
                            precipitationRate, atmosphericClarity, isNightTime);
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        
+
         EnvironmentParameters that = (EnvironmentParameters) o;
-        
+
         return Double.compare(that.temperature, temperature) == 0 &&
                Double.compare(that.humidity, humidity) == 0 &&
                Double.compare(that.windSpeed, windSpeed) == 0 &&
@@ -459,7 +455,7 @@ public class EnvironmentParameters {
                Double.compare(that.atmosphericClarity, atmosphericClarity) == 0 &&
                isNightTime == that.isNightTime;
     }
-    
+
     @Override
     public int hashCode() {
         int result;
@@ -477,4 +473,4 @@ public class EnvironmentParameters {
         result = 31 * result + (isNightTime ? 1 : 0);
         return result;
     }
-} 
+}
