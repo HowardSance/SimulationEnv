@@ -6,7 +6,7 @@ import com.JP.dronesim.domain.common.enums.DeviceType;
 import com.JP.dronesim.domain.common.valueobjects.Position;
 import com.JP.dronesim.domain.device.model.AbstractProbeDevice;
 import com.JP.dronesim.domain.device.model.common.SensorParameters;
-import com.JP.dronesim.domain.device.model.common.events.DetectionEvent;
+import com.JP.dronesim.domain.device.model.events.DetectionEvent;
 import com.JP.dronesim.domain.uav.model.AirspaceEnvironment;
 import com.JP.dronesim.domain.uav.model.UAV;
 

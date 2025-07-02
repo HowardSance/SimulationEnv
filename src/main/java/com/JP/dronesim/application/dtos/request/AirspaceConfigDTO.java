@@ -7,7 +7,7 @@ import javax.validation.constraints.DecimalMax;
 
 /**
  * 空域配置DTO
- * 用于初始化空域配�?
+ * 用于初始化空域配置
  *
  * @author JP Team
  * @version 1.0
@@ -26,73 +26,73 @@ public class AirspaceConfigDTO {
     private String description;
 
     /**
-     * 空域边界最小X坐标（米�?
+     * 空域边界最小X坐标（米）
      */
     @NotNull(message = "空域边界最小X坐标不能为空")
     private Double minX;
 
     /**
-     * 空域边界最小Y坐标（米�?
+     * 空域边界最小Y坐标（米）
      */
     @NotNull(message = "空域边界最小Y坐标不能为空")
     private Double minY;
 
     /**
-     * 空域边界最小Z坐标（米�?
+     * 空域边界最小Z坐标（米）
      */
     @NotNull(message = "空域边界最小Z坐标不能为空")
     private Double minZ;
 
     /**
-     * 空域边界最大X坐标（米�?
+     * 空域边界最大X坐标（米）
      */
     @NotNull(message = "空域边界最大X坐标不能为空")
     private Double maxX;
 
     /**
-     * 空域边界最大Y坐标（米�?
+     * 空域边界最大Y坐标（米）
      */
     @NotNull(message = "空域边界最大Y坐标不能为空")
     private Double maxY;
 
     /**
-     * 空域边界最大Z坐标（米�?
+     * 空域边界最大Z坐标（米）
      */
     @NotNull(message = "空域边界最大Z坐标不能为空")
     private Double maxZ;
 
     /**
-     * 时间步长（秒�?
+     * 时间步长（秒）
      */
     @NotNull(message = "时间步长不能为空")
-    @DecimalMin(value = "0.1", message = "时间步长必须大于0.1�?)
+    @DecimalMin(value = "0.1", message = "时间步长必须大于0.1")
     private Double timeStep;
 
     /**
-     * 温度（摄氏度�?
+     * 温度（摄氏度）
      */
-    @DecimalMin(value = "-100", message = "温度不能低于-100摄氏�?)
-    @DecimalMax(value = "100", message = "温度不能高于100摄氏�?)
+    @DecimalMin(value = "-100", message = "温度不能低于-100摄氏度")
+    @DecimalMax(value = "100", message = "温度不能高于100摄氏度")
     private Double temperature;
 
     /**
-     * 湿度（百分比�?
+     * 湿度（百分比）
      */
-    @DecimalMin(value = "0", message = "湿度不能为负�?)
+    @DecimalMin(value = "0", message = "湿度不能为负数")
     @DecimalMax(value = "100", message = "湿度不能超过100%")
     private Double humidity;
 
     /**
-     * 风速（�?秒）
+     * 风速（米/秒）
      */
     @DecimalMin(value = "0", message = "风速不能为负数")
     private Double windSpeed;
 
     /**
-     * 风向（度�?
+     * 风向（度）
      */
-    @DecimalMin(value = "0", message = "风向角度不能为负�?)
-    @DecimalMax(value = "360", message = "风向角度不能超过360�?)
+    @DecimalMin(value = "0", message = "风向角度不能为负数")
+    @DecimalMax(value = "360", message = "风向角度不能超过360度")
     private Double windDirection;
 
     /**
@@ -102,19 +102,19 @@ public class AirspaceConfigDTO {
     private Double visibility;
 
     /**
-     * 气压（帕斯卡�?
+     * 气压（帕斯卡）
      */
-    @DecimalMin(value = "0", message = "气压不能为负�?)
+        @DecimalMin(value = "0", message = "气压不能为负数")
     private Double pressure;
 
     /**
-     * 默认构造函�?
+     * 默认构造函数
      */
     public AirspaceConfigDTO() {
     }
 
     /**
-     * 构造函�?
+     * 构造函数
      *
      * @param name 空域名称
      * @param description 空域描述
@@ -338,18 +338,18 @@ public class AirspaceConfigDTO {
     }
 
     /**
-     * 获取风�?
+     * 获取风速
      *
-     * @return 风�?
+     * @return 风速
      */
     public Double getWindSpeed() {
         return windSpeed;
     }
 
     /**
-     * 设置风�?
+     * 设置风速
      *
-     * @param windSpeed 风�?
+     * @param windSpeed 风速
      */
     public void setWindSpeed(Double windSpeed) {
         this.windSpeed = windSpeed;
@@ -374,18 +374,18 @@ public class AirspaceConfigDTO {
     }
 
     /**
-     * 获取能见�?
+     * 获取能见度
      *
-     * @return 能见�?
+     * @return 能见度
      */
     public Double getVisibility() {
         return visibility;
     }
 
     /**
-     * 设置能见�?
+     * 设置能见度
      *
-     * @param visibility 能见�?
+     * @param visibility 能见度
      */
     public void setVisibility(Double visibility) {
         this.visibility = visibility;

@@ -9,7 +9,7 @@ import java.util.Map;
 
 /**
  * 实体状态DTO
- * 用于实体（设�?无人机）的当前状态响应，用于实时推送和查询
+ * 用于实体（设�?无人机）的当前状态响应，用于实时推送和查询
  *
  * @author JP Team
  * @version 1.0
@@ -42,22 +42,22 @@ public class EntityStateDTO {
     private Velocity velocity;
 
     /**
-     * 实体姿�?
+     * 实体姿�?
      */
     private Orientation orientation;
 
     /**
-     * 实体状�?
+     * 实体状�?
      */
     private String status;
 
     /**
-     * 实体属�?
+     * 实体属�?
      */
     private Map<String, Object> properties;
 
     /**
-     * 最后更新时�?
+     * 最后更新时�?
      */
     private LocalDateTime lastUpdateTime;
 
@@ -67,18 +67,18 @@ public class EntityStateDTO {
     private Boolean active;
 
     /**
-     * 健康状�?
+     * 健康状�?
      */
     private String healthStatus;
 
     /**
-     * 默认构造函�?
+     * 默认构造函�?
      */
     public EntityStateDTO() {
     }
 
     /**
-     * 构造函�?
+     * 构造函�?
      *
      * @param id 实体ID
      * @param type 实体类型
@@ -93,15 +93,15 @@ public class EntityStateDTO {
     }
 
     /**
-     * 构造函�?
+     * 构造函�?
      *
      * @param id 实体ID
      * @param type 实体类型
      * @param name 实体名称
      * @param position 实体位置
      * @param velocity 实体速度
-     * @param orientation 实体姿�?
-     * @param status 实体状�?
+     * @param orientation 实体姿�?
+     * @param status 实体状�?
      */
     public EntityStateDTO(String id, String type, String name, Position position,
                          Velocity velocity, Orientation orientation, String status) {
@@ -205,72 +205,72 @@ public class EntityStateDTO {
     }
 
     /**
-     * 获取实体姿�?
+     * 获取实体姿�?
      *
-     * @return 实体姿�?
+     * @return 实体姿�?
      */
     public Orientation getOrientation() {
         return orientation;
     }
 
     /**
-     * 设置实体姿�?
+     * 设置实体姿�?
      *
-     * @param orientation 实体姿�?
+     * @param orientation 实体姿�?
      */
     public void setOrientation(Orientation orientation) {
         this.orientation = orientation;
     }
 
     /**
-     * 获取实体状�?
+     * 获取实体状�?
      *
-     * @return 实体状�?
+     * @return 实体状�?
      */
     public String getStatus() {
         return status;
     }
 
     /**
-     * 设置实体状�?
+     * 设置实体状�?
      *
-     * @param status 实体状�?
+     * @param status 实体状�?
      */
     public void setStatus(String status) {
         this.status = status;
     }
 
     /**
-     * 获取实体属�?
+     * 获取实体属�?
      *
-     * @return 实体属�?
+     * @return 实体属�?
      */
     public Map<String, Object> getProperties() {
         return properties;
     }
 
     /**
-     * 设置实体属�?
+     * 设置实体属�?
      *
-     * @param properties 实体属�?
+     * @param properties 实体属�?
      */
     public void setProperties(Map<String, Object> properties) {
         this.properties = properties;
     }
 
     /**
-     * 获取最后更新时�?
+     * 获取最后更新时�?
      *
-     * @return 最后更新时�?
+     * @return 最后更新时�?
      */
     public LocalDateTime getLastUpdateTime() {
         return lastUpdateTime;
     }
 
     /**
-     * 设置最后更新时�?
+     * 设置最后更新时�?
      *
-     * @param lastUpdateTime 最后更新时�?
+     * @param lastUpdateTime 最后更新时�?
      */
     public void setLastUpdateTime(LocalDateTime lastUpdateTime) {
         this.lastUpdateTime = lastUpdateTime;
@@ -295,18 +295,18 @@ public class EntityStateDTO {
     }
 
     /**
-     * 获取健康状�?
+     * 获取健康状�?
      *
-     * @return 健康状�?
+     * @return 健康状�?
      */
     public String getHealthStatus() {
         return healthStatus;
     }
 
     /**
-     * 设置健康状�?
+     * 设置健康状�?
      *
-     * @param healthStatus 健康状�?
+     * @param healthStatus 健康状�?
      */
     public void setHealthStatus(String healthStatus) {
         this.healthStatus = healthStatus;

@@ -4,9 +4,9 @@ import com.JP.dronesim.application.dtos.response.EntityStateDTO;
 import com.JP.dronesim.application.dtos.response.DetectionLogEntryDTO;
 import com.JP.dronesim.domain.airspace.model.Airspace;
 import com.JP.dronesim.domain.airspace.repository.IAirspaceRepository;
-import com.JP.dronesim.domain.device.model.ProbeDevice;
+import com.JP.dronesim.domain.device.model.AbstractProbeDevice;
 import com.JP.dronesim.domain.device.model.common.DetectionLog;
-import com.JP.dronesim.domain.device.model.common.events.DetectionEvent;
+import com.JP.dronesim.domain.device.model.events.DetectionEvent;
 import com.JP.dronesim.domain.uav.model.UAV;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,8 +27,8 @@ public class QueryAppService {
     /**
      * 获取空域内所有实体状态（设备+无人机）
      */
-    public List<EntityStateDTO> getAllEntityStates(String airspaceId) {
-        Airspace airspace = getAirspaceOrThrow(airspaceId);
+    public List<EntityStateDTO> getAllEntityStates() {
+        Airspace airspace = getAirspaceOrThrow();
         List<EntityStateDTO> result = new ArrayList<>();
         // 设备
         for (ProbeDevice device : airspace.getProbeDevices().values()) {
@@ -44,8 +44,8 @@ public class QueryAppService {
     /**
      * 获取特定设备详情
      */
-    public Map<String, Object> getDeviceDetails(String airspaceId, String deviceId) {
-        Airspace airspace = getAirspaceOrThrow(airspaceId);
+    public Map<String, Object> getDeviceDetails(String deviceId) {
+        Airspace airspace = getAirspaceOrThrow();
         ProbeDevice device = airspace.getProbeDevices().get(deviceId);
         if (device == null) throw new RuntimeException("设备不存在: " + deviceId);
         Map<String, Object> details = new HashMap<>();
@@ -62,8 +62,8 @@ public class QueryAppService {
     /**
      * 获取探测日志（可按设备、时间过滤）
      */
-    public List<DetectionLogEntryDTO> getDetectionLogs(String airspaceId, String deviceId, LocalDateTime start, LocalDateTime end) {
-        Airspace airspace = getAirspaceOrThrow(airspaceId);
+    public List<DetectionLogEntryDTO> getDetectionLogs(String deviceId, LocalDateTime start, LocalDateTime end) {
+        Airspace airspace = getAirspaceOrThrow();
         List<DetectionEvent> events = new ArrayList<>();
         if (deviceId != null) {
             ProbeDevice device = airspace.getProbeDevices().get(deviceId);
@@ -88,9 +88,8 @@ public class QueryAppService {
     }
 
     // ====== 私有工具方法 ======
-    private Airspace getAirspaceOrThrow(String airspaceId) {
-        return airspaceRepository.findById(airspaceId)
-                .orElseThrow(() -> new RuntimeException("空域不存在: " + airspaceId));
+    private Airspace getAirspaceOrThrow() {
+        return airspaceRepository.find().orElseThrow(() -> new RuntimeException("空域不存在"));
     }
 
     private EntityStateDTO toEntityStateDTO(ProbeDevice device) {
@@ -139,4 +138,4 @@ public class QueryAppService {
         if (events.isEmpty()) return null;
         return events.get(events.size() - 1).getTimestamp();
     }
-} 
+}

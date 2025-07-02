@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -29,12 +30,12 @@ public class SimulationAppService {
     private SimulationEngineService simulationEngineService;
 
     /**
-     * 仿真状态存�?
+     * 仿真状态存储
      */
     private final ConcurrentHashMap<String, SimulationStatusDTO> simulationStatusMap = new ConcurrentHashMap<>();
 
     /**
-     * 仿真运行状�?
+     * 仿真运行状态
      */
     private final ConcurrentHashMap<String, AtomicBoolean> runningStatusMap = new ConcurrentHashMap<>();
 
@@ -42,7 +43,7 @@ public class SimulationAppService {
      * 启动仿真
      *
      * @param airspaceId 空域ID
-     * @return 仿真状�?
+     * @return 仿真状态
      */
     public SimulationStatusDTO startSimulation(String airspaceId) {
         // 业务规则校验
@@ -55,13 +56,13 @@ public class SimulationAppService {
         // 启动仿真引擎
         simulationEngineService.startSimulation(airspace);
 
-        // 更新状�?
+        // 更新状态
         SimulationStatusDTO status = new SimulationStatusDTO();
         status.setAirspaceId(airspaceId);
         status.setStatus("RUNNING");
         status.setStartTime(LocalDateTime.now());
-        status.setCurrentTime(airspace.getCurrentTime());
-        status.setTimeStep(airspace.getTimeStep());
+        status.setCurrentTime(airspace.getLastUpdatedAt().toEpochSecond(ZoneOffset.UTC));
+        status.setTimeStep(airspace.getTimeStep().getStepSize());
 
         simulationStatusMap.put(airspaceId, status);
         runningStatusMap.put(airspaceId, new AtomicBoolean(true));
@@ -73,7 +74,7 @@ public class SimulationAppService {
      * 暂停仿真
      *
      * @param airspaceId 空域ID
-     * @return 仿真状�?
+     * @return 仿真状态
      */
     public SimulationStatusDTO pauseSimulation(String airspaceId) {
         // 业务规则校验
@@ -86,7 +87,7 @@ public class SimulationAppService {
         // 暂停仿真引擎
         simulationEngineService.pauseSimulation(airspace);
 
-        // 更新状�?
+        // 更新状态
         SimulationStatusDTO status = simulationStatusMap.get(airspaceId);
         if (status != null) {
             status.setStatus("PAUSED");
@@ -102,7 +103,7 @@ public class SimulationAppService {
      * 恢复仿真
      *
      * @param airspaceId 空域ID
-     * @return 仿真状�?
+     * @return 仿真状态
      */
     public SimulationStatusDTO resumeSimulation(String airspaceId) {
         // 业务规则校验
@@ -115,7 +116,7 @@ public class SimulationAppService {
         // 恢复仿真引擎
         simulationEngineService.resumeSimulation(airspace);
 
-        // 更新状�?
+        // 更新状态
         SimulationStatusDTO status = simulationStatusMap.get(airspaceId);
         if (status != null) {
             status.setStatus("RUNNING");
@@ -131,7 +132,7 @@ public class SimulationAppService {
      * 停止仿真
      *
      * @param airspaceId 空域ID
-     * @return 仿真状�?
+     * @return 仿真状态
      */
     public SimulationStatusDTO stopSimulation(String airspaceId) {
         // 业务规则校验
@@ -143,7 +144,7 @@ public class SimulationAppService {
         // 停止仿真引擎
         simulationEngineService.stopSimulation(airspace);
 
-        // 更新状�?
+        // 更新状态
         SimulationStatusDTO status = simulationStatusMap.get(airspaceId);
         if (status != null) {
             status.setStatus("STOPPED");
@@ -160,7 +161,7 @@ public class SimulationAppService {
      *
      * @param airspaceId 空域ID
      * @param timeStep 时间步长
-     * @return 仿真状�?
+     * @return 仿真状态
      */
     public SimulationStatusDTO stepSimulation(String airspaceId, double timeStep) {
         // 业务规则校验
@@ -173,10 +174,10 @@ public class SimulationAppService {
         // 执行时间步进
         simulationEngineService.stepSimulation(airspace, timeStep);
 
-        // 更新状�?
+        // 更新状态
         SimulationStatusDTO status = simulationStatusMap.get(airspaceId);
         if (status != null) {
-            status.setCurrentTime(airspace.getCurrentTime());
+            status.setCurrentTime(airspace.getLastUpdatedAt().toEpochSecond(ZoneOffset.UTC));
             status.setLastStepTime(LocalDateTime.now());
         }
 
@@ -184,10 +185,10 @@ public class SimulationAppService {
     }
 
     /**
-     * 获取仿真状�?
+     * 获取仿真状态
      *
      * @param airspaceId 空域ID
-     * @return 仿真状�?
+     * @return 仿真状态
      */
     public SimulationStatusDTO getSimulationStatus(String airspaceId) {
         // 业务规则校验
@@ -195,13 +196,13 @@ public class SimulationAppService {
 
         SimulationStatusDTO status = simulationStatusMap.get(airspaceId);
         if (status == null) {
-            // 如果状态不存在，创建默认状�?
+            // 如果状态不存在，创建默认状态
             Airspace airspace = airspaceRepository.findById(airspaceId);
             status = new SimulationStatusDTO();
             status.setAirspaceId(airspaceId);
             status.setStatus("STOPPED");
-            status.setCurrentTime(airspace.getCurrentTime());
-            status.setTimeStep(airspace.getTimeStep());
+            status.setCurrentTime(airspace.getLastUpdatedAt().toEpochSecond(ZoneOffset.UTC));
+            status.setTimeStep(airspace.getTimeStep().getStepSize());
             simulationStatusMap.put(airspaceId, status);
         }
 
@@ -213,7 +214,7 @@ public class SimulationAppService {
      *
      * @param airspaceId 空域ID
      * @param timeStep 时间步长
-     * @return 仿真状�?
+     * @return 仿真状态
      */
     public SimulationStatusDTO setTimeStep(String airspaceId, double timeStep) {
         // 业务规则校验
@@ -227,7 +228,7 @@ public class SimulationAppService {
         airspace.setTimeStep(timeStep);
         airspaceRepository.save(airspace);
 
-        // 更新状�?
+        // 更新状态
         SimulationStatusDTO status = simulationStatusMap.get(airspaceId);
         if (status != null) {
             status.setTimeStep(timeStep);
@@ -243,19 +244,19 @@ public class SimulationAppService {
      */
     private void validateAirspaceExists(String airspaceId) {
         if (!airspaceRepository.existsById(airspaceId)) {
-            throw new RuntimeException("空域不存�? " + airspaceId);
+            throw new RuntimeException("空域不存在: " + airspaceId);
         }
     }
 
     /**
-     * 校验仿真是否未运�?
+     * 校验仿真是否未运行
      *
      * @param airspaceId 空域ID
      */
     private void validateSimulationNotRunning(String airspaceId) {
         AtomicBoolean running = runningStatusMap.get(airspaceId);
         if (running != null && running.get()) {
-            throw new RuntimeException("仿真已在运行�? " + airspaceId);
+            throw new RuntimeException("仿真已在运行: " + airspaceId);
         }
     }
 
@@ -272,14 +273,14 @@ public class SimulationAppService {
     }
 
     /**
-     * 校验仿真是否已暂�?
+     * 校验仿真是否已暂停
      *
      * @param airspaceId 空域ID
      */
     private void validateSimulationPaused(String airspaceId) {
         AtomicBoolean running = runningStatusMap.get(airspaceId);
         if (running == null || running.get()) {
-            throw new RuntimeException("仿真未暂�? " + airspaceId);
+            throw new RuntimeException("仿真未暂停: " + airspaceId);
         }
     }
 
@@ -292,7 +293,7 @@ public class SimulationAppService {
         if (timeStep <= 0) {
             throw new RuntimeException("时间步长必须大于0");
         }
-        if (timeStep > 3600) { // 最�?小时
+        if (timeStep > 3600) { // 最大1小时
             throw new RuntimeException("时间步长不能超过1小时");
         }
     }

@@ -7,21 +7,21 @@ import com.JP.dronesim.domain.common.valueobjects.Orientation;
 import com.JP.dronesim.domain.common.valueobjects.Position;
 import com.JP.dronesim.domain.device.model.common.DetectionLog;
 import com.JP.dronesim.domain.device.model.common.SensorParameters;
-import com.JP.dronesim.domain.device.model.common.events.DetectionEvent;
-import com.JP.dronesim.domain.uav.model.AirspaceEnvironment;
+import com.JP.dronesim.domain.device.model.events.DetectionEvent;
+import com.JP.dronesim.domain.airspace.model.Airspace;
 import com.JP.dronesim.domain.uav.model.UAV;
 
 import java.util.List;
 
 /**
  * 抽象探测设备基类
- * 实现探测设备接口中的通用逻辑
- * 为具体的探测设备类型提供基础实现
+ * 定义所有探测设备的共同属性和行为，并提供通用实现
+ * 适用于雷达、光电摄像头、无线电探测器、GPS诱导器等设备
  * 
  * @author JP
  * @version 1.0
  */
-public abstract class AbstractProbeDevice implements ProbeDevice {
+public abstract class AbstractProbeDevice {
     
     /**
      * 设备唯一标识符
@@ -100,104 +100,180 @@ public abstract class AbstractProbeDevice implements ProbeDevice {
         this.initialized = false;
     }
     
-    // ================ 基础属性访问方法实现 ================
+    // ================ 基础属性访问方法 ================
     
-    @Override
+    /**
+     * 获取设备唯一标识符
+     * 
+     * @return 设备ID
+     */
     public String getId() {
         return id;
     }
     
-    @Override
+    /**
+     * 获取设备名称
+     * 
+     * @return 设备名称
+     */
     public String getName() {
         return name;
     }
     
-    @Override
+    /**
+     * 获取设备类型
+     * 
+     * @return 设备类型枚举
+     */
     public DeviceType getType() {
         return type;
     }
     
-    @Override
+    /**
+     * 获取设备位置坐标
+     * 
+     * @return NED坐标系中的三维位置
+     */
     public Position getPosition() {
         return position;
     }
     
-    @Override
+    /**
+     * 设置设备位置坐标
+     * 
+     * @param position NED坐标系中的三维位置
+     */
     public void setPosition(Position position) {
         validatePosition(position);
         this.position = position;
     }
     
-    @Override
+    /**
+     * 获取设备朝向
+     * 
+     * @return 设备朝向角度（0-360度）
+     */
     public double getOrientation() {
         return orientation;
     }
     
-    @Override
+    /**
+     * 设置设备朝向
+     * 
+     * @param orientation 设备朝向角度（0-360度）
+     */
     public void setOrientation(double orientation) {
         validateOrientation(orientation);
         this.orientation = orientation;
     }
     
-    @Override
+    /**
+     * 获取设备仰角
+     * 
+     * @return 设备仰角（0-90度）
+     */
     public double getElevation() {
         return elevation;
     }
     
-    @Override
+    /**
+     * 设置设备仰角
+     * 
+     * @param elevation 设备仰角（0-90度）
+     */
     public void setElevation(double elevation) {
         validateElevation(elevation);
         this.elevation = elevation;
     }
     
-    @Override
+    /**
+     * 获取设备姿态信息
+     * 
+     * @return 设备的三维姿态
+     */
     public Orientation getAttitude() {
         return attitude;
     }
     
-    @Override
+    /**
+     * 设置设备姿态信息
+     * 
+     * @param attitude 设备的三维姿态
+     */
     public void setAttitude(Orientation attitude) {
         this.attitude = attitude;
     }
     
-    @Override
+    /**
+     * 获取设备有效探测距离
+     * 
+     * @return 最大有效探测/影响距离（米）
+     */
     public double getDetectionRange() {
         return detectionRange;
     }
     
-    @Override
+    /**
+     * 设置设备有效探测距离
+     * 
+     * @param detectionRange 最大有效探测/影响距离（米）
+     */
     public void setDetectionRange(double detectionRange) {
         validateDetectionRange(detectionRange);
         this.detectionRange = detectionRange;
     }
     
-    @Override
+    /**
+     * 获取设备视场角
+     * 
+     * @return 探测设备的视场角度（例如光电摄像头的角度，雷达的波束宽度）
+     */
     public double getFieldOfView() {
         return fieldOfView;
     }
     
-    @Override
+    /**
+     * 设置设备视场角
+     * 
+     * @param fieldOfView 探测设备的视场角度
+     */
     public void setFieldOfView(double fieldOfView) {
         validateFieldOfView(fieldOfView);
         this.fieldOfView = fieldOfView;
     }
     
-    @Override
+    /**
+     * 获取设备运行状态
+     * 
+     * @return 设备状态枚举（active/inactive/error）
+     */
     public DeviceStatus getStatus() {
         return status;
     }
     
-    @Override
+    /**
+     * 设置设备运行状态
+     * 
+     * @param status 设备状态枚举
+     */
     public void setStatus(DeviceStatus status) {
         this.status = status;
     }
     
-    @Override
+    /**
+     * 获取探测参数
+     * 
+     * @return 特定传感器类型的详细参数
+     */
     public SensorParameters getDetectionParameters() {
         return detectionParameters;
     }
     
-    @Override
+    /**
+     * 设置探测参数
+     * 
+     * @param parameters 特定传感器类型的详细参数
+     */
     public void setDetectionParameters(SensorParameters parameters) {
         if (parameters != null && !parameters.isValid()) {
             throw new IllegalArgumentException("探测参数无效");
@@ -205,7 +281,11 @@ public abstract class AbstractProbeDevice implements ProbeDevice {
         this.detectionParameters = parameters;
     }
     
-    @Override
+    /**
+     * 获取探测日志
+     * 
+     * @return 探测事件的存储列表
+     */
     public DetectionLog getDetectionLog() {
         return detectionLog;
     }
@@ -219,9 +299,16 @@ public abstract class AbstractProbeDevice implements ProbeDevice {
         return detectionLog.getAllEvents();
     }
     
-    // ================ 行为方法实现 ================
+    // ================ 行为方法 ================
     
-    @Override
+    /**
+     * 初始化探测设备
+     * 设置设备的初始位置、姿态和特定类型参数
+     * 
+     * @param params 包含设备ID、名称、位置、姿态和特定类型参数的初始化参数对象
+     * @throws IllegalArgumentException 如果参数无效
+     * @throws IllegalStateException 如果设备已经初始化
+     */
     public void initialize(DeviceInitParamsDTO params) {
         if (initialized) {
             throw new IllegalStateException("设备已经初始化");
@@ -246,8 +333,17 @@ public abstract class AbstractProbeDevice implements ProbeDevice {
         this.initialized = true;
     }
     
-    @Override
-    public List<DetectionEvent> performDetection(AirspaceEnvironment airspace, List<UAV> uavs) {
+    /**
+     * 执行探测扫描/影响逻辑
+     * 此方法将与AirSim API和内部探测/影响算法结合，
+     * 尝试探测/影响空域中的无人机
+     * 
+     * @param airspace 当前空域环境对象
+     * @param uavs 当前空域中的所有无人机列表
+     * @return 成功探测到的无人机事件列表（GPS诱导器可能返回受影响的UAV列表或影响事件）
+     * @throws IllegalStateException 如果设备未初始化或处于错误状态
+     */
+    public List<DetectionEvent> performDetection(Airspace airspace, List<UAV> uavs) {
         if (!initialized) {
             throw new IllegalStateException("设备未初始化");
         }
@@ -268,7 +364,13 @@ public abstract class AbstractProbeDevice implements ProbeDevice {
         return events;
     }
     
-    @Override
+    /**
+     * 运行时动态调整探测设备的参数
+     * 
+     * @param newParams 包含需要更新的参数及其新值的参数对象
+     * @throws IllegalArgumentException 如果新参数无效或类型不匹配
+     * @throws IllegalStateException 如果设备不支持参数调整
+     */
     public void adjustParameters(SensorParameters newParams) {
         if (!initialized) {
             throw new IllegalStateException("设备未初始化");
@@ -283,24 +385,86 @@ public abstract class AbstractProbeDevice implements ProbeDevice {
         this.detectionParameters = newParams;
     }
     
-    // ================ 状态检查方法实现 ================
+    /**
+     * 通用设备参数热更新（用于DTO参数Map场景）
+     * @param paramMap 参数键值对
+     */
+    public void updateParameters(java.util.Map<String, Object> paramMap) {
+        // 默认实现：简化的参数更新逻辑
+        if (paramMap == null || paramMap.isEmpty()) {
+            return;
+        }
+        
+        try {
+            // 更新基础参数
+            if (paramMap.containsKey("detectionRange")) {
+                Object value = paramMap.get("detectionRange");
+                if (value instanceof Number) {
+                    this.setDetectionRange(((Number) value).doubleValue());
+                }
+            }
+            
+            if (paramMap.containsKey("fieldOfView")) {
+                Object value = paramMap.get("fieldOfView");
+                if (value instanceof Number) {
+                    this.setFieldOfView(((Number) value).doubleValue());
+                }
+            }
+            
+            if (paramMap.containsKey("orientation")) {
+                Object value = paramMap.get("orientation");
+                if (value instanceof Number) {
+                    this.setOrientation(((Number) value).doubleValue());
+                }
+            }
+            
+            if (paramMap.containsKey("elevation")) {
+                Object value = paramMap.get("elevation");
+                if (value instanceof Number) {
+                    this.setElevation(((Number) value).doubleValue());
+                }
+            }
+            
+        } catch (Exception e) {
+            throw new IllegalArgumentException("参数更新失败: " + e.getMessage(), e);
+        }
+    }
     
-    @Override
+    // ================ 状态检查方法 ================
+    
+    /**
+     * 检查设备是否已初始化
+     * 
+     * @return true表示设备已初始化，false表示未初始化
+     */
     public boolean isInitialized() {
         return initialized;
     }
     
-    @Override
+    /**
+     * 检查设备是否处于活跃状态
+     * 
+     * @return true表示设备可以执行探测任务，false表示不可以
+     */
     public boolean isActive() {
         return status == DeviceStatus.ACTIVE;
     }
     
-    @Override
+    /**
+     * 检查设备是否处于错误状态
+     * 
+     * @return true表示设备有故障，false表示正常
+     */
     public boolean hasError() {
         return status == DeviceStatus.ERROR;
     }
     
-    @Override
+    /**
+     * 启用设备
+     * 将设备状态设置为活跃状态
+     * 
+     * @throws IllegalStateException 如果设备未初始化或处于错误状态
+     */
     public void enable() {
         if (!initialized) {
             throw new IllegalStateException("设备未初始化");
@@ -311,12 +475,20 @@ public abstract class AbstractProbeDevice implements ProbeDevice {
         this.status = DeviceStatus.ACTIVE;
     }
     
-    @Override
+    /**
+     * 禁用设备
+     * 将设备状态设置为非活跃状态
+     */
     public void disable() {
         this.status = DeviceStatus.INACTIVE;
     }
     
-    @Override
+    /**
+     * 重置设备
+     * 清除探测日志，重置设备状态
+     * 
+     * @throws IllegalStateException 如果设备未初始化
+     */
     public void reset() {
         if (!initialized) {
             throw new IllegalStateException("设备未初始化");
@@ -329,9 +501,14 @@ public abstract class AbstractProbeDevice implements ProbeDevice {
         doReset();
     }
     
-    // ================ 验证方法实现 ================
+    // ================ 验证方法 ================
     
-    @Override
+    /**
+     * 验证设备配置的有效性
+     * 检查所有参数是否在合理范围内
+     * 
+     * @return true表示配置有效，false表示配置无效
+     */
     public boolean validateConfiguration() {
         if (!initialized) {
             return false;
@@ -350,7 +527,12 @@ public abstract class AbstractProbeDevice implements ProbeDevice {
         }
     }
     
-    @Override
+    /**
+     * 获取设备配置的描述信息
+     * 用于日志记录和调试
+     * 
+     * @return 设备配置的字符串描述
+     */
     public String getConfigurationDescription() {
         return String.format("Device[id=%s, name=%s, type=%s, position=%s, orientation=%.2f, " +
                         "elevation=%.2f, range=%.2f, fov=%.2f, status=%s, initialized=%s]",
@@ -376,7 +558,7 @@ public abstract class AbstractProbeDevice implements ProbeDevice {
      * @param uavs 无人机列表
      * @return 探测事件列表
      */
-    protected abstract List<DetectionEvent> doPerformDetection(AirspaceEnvironment airspace, List<UAV> uavs);
+    protected abstract List<DetectionEvent> doPerformDetection(Airspace airspace, List<UAV> uavs);
     
     /**
      * 执行特定类型的参数调整逻辑

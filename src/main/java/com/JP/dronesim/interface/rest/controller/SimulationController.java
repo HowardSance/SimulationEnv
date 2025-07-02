@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 /**
- * 仿真控制REST控制�?
+ * 仿真控制REST控制器
  * 处理仿真启动、暂停、停止、时间步进等操作
  *
  * @author JP Team
@@ -28,7 +28,7 @@ public class SimulationController {
      * 启动仿真
      *
      * @param airspaceId 空域ID
-     * @return 仿真状�?
+     * @return 仿真状态
      */
     @PostMapping("/{airspaceId}/start")
     public ResponseEntity<SimulationStatusDTO> startSimulation(@PathVariable String airspaceId) {
@@ -44,7 +44,7 @@ public class SimulationController {
      * 暂停仿真
      *
      * @param airspaceId 空域ID
-     * @return 仿真状�?
+     * @return 仿真状态
      */
     @PostMapping("/{airspaceId}/pause")
     public ResponseEntity<SimulationStatusDTO> pauseSimulation(@PathVariable String airspaceId) {
@@ -60,7 +60,7 @@ public class SimulationController {
      * 恢复仿真
      *
      * @param airspaceId 空域ID
-     * @return 仿真状�?
+     * @return 仿真状态
      */
     @PostMapping("/{airspaceId}/resume")
     public ResponseEntity<SimulationStatusDTO> resumeSimulation(@PathVariable String airspaceId) {
@@ -76,7 +76,7 @@ public class SimulationController {
      * 停止仿真
      *
      * @param airspaceId 空域ID
-     * @return 仿真状�?
+     * @return 仿真状态
      */
     @PostMapping("/{airspaceId}/stop")
     public ResponseEntity<SimulationStatusDTO> stopSimulation(@PathVariable String airspaceId) {
@@ -93,7 +93,7 @@ public class SimulationController {
      *
      * @param airspaceId 空域ID
      * @param command 控制指令
-     * @return 仿真状�?
+     * @return 仿真状态
      */
     @PostMapping("/{airspaceId}/step")
     public ResponseEntity<SimulationStatusDTO> stepSimulation(
@@ -108,10 +108,10 @@ public class SimulationController {
     }
 
     /**
-     * 获取仿真状�?
+     * 获取仿真状态
      *
      * @param airspaceId 空域ID
-     * @return 仿真状�?
+     * @return 仿真状态
      */
     @GetMapping("/{airspaceId}/status")
     public ResponseEntity<SimulationStatusDTO> getSimulationStatus(@PathVariable String airspaceId) {
@@ -128,7 +128,7 @@ public class SimulationController {
      *
      * @param airspaceId 空域ID
      * @param command 控制指令
-     * @return 仿真状�?
+     * @return 仿真状态
      */
     @PutMapping("/{airspaceId}/timestep")
     public ResponseEntity<SimulationStatusDTO> setTimeStep(

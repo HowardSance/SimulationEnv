@@ -3,43 +3,43 @@ package com.JP.dronesim.domain.common.enums;
 /**
  * 探测设备运行状态枚举
  * 定义探测设备的所有可能运行状态
- * 
+ *
  * @author JP
  * @version 1.0
  */
 public enum DeviceStatus {
-    
+
     /**
      * 设备正常运行状态
      * 设备可以正常执行探测任务
      */
     ACTIVE("active", "运行中"),
-    
+
     /**
      * 设备非活跃状态
      * 设备处于待机或关闭状态，不执行探测任务
      */
     INACTIVE("inactive", "非活跃"),
-    
+
     /**
      * 设备错误状态
      * 设备出现故障，无法正常工作
      */
     ERROR("error", "错误");
-    
+
     /**
      * 状态代码
      */
     private final String code;
-    
+
     /**
      * 状态描述
      */
     private final String description;
-    
+
     /**
      * 构造函数
-     * 
+     *
      * @param code 状态代码
      * @param description 状态描述
      */
@@ -47,7 +47,7 @@ public enum DeviceStatus {
         this.code = code;
         this.description = description;
     }
-    
+
     /**
      * 获取状态代码
      * 

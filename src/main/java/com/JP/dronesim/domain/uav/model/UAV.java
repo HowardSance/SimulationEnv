@@ -30,22 +30,22 @@ public class UAV {
      * 无人机名称
      */
     private String name;
-    
+
     /**
      * 无人机当前状态（包含运动状态和物理特性）
      */
     private UAVState currentState;
-    
+
     /**
      * 飞行路径：无人机的飞行路径，航点列表
      */
     private List<Waypoint> flightPath;
-    
+
     /**
      * 当前目标航点索引
      */
     private int currentWaypointIndex;
-    
+
     /**
      * 运行状态：悬停、运动、侦测（枚举）
      */

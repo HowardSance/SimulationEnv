@@ -1,9 +1,4 @@
 ---
-description: 
-globs: 
-alwaysApply: true
----
----
 description: 项目架构规范
 globs: true
 alwaysApply: true
@@ -72,7 +67,7 @@ backend/
 │   │   │       │   │   │   ├── radiodetector/
 │   │   │       │   │   │   │   ├── RadioDetector.java      // 实体：无线电侦测器领域模型
 │   │   │       │   │   │   │   └── RadioParameters.java    // 值对象：无线电侦测特有参数 (频率范围、方向探测精度等)
-│   │   │       │   │   │   ├── gpsjammer/
+│   │   │       │   │   │   ├── gps/
 │   │   │       │   │   │   │   ├── GPSJammer.java          // 实体：GPS诱导器领域模型
 │   │   │       │   │   │   │   └── JammerParameters.java   // 值对象：诱导器特有参数 (诱导频率、功率、信号类型等)
 │   │   │       │   │   │   └── events/         // 值对象

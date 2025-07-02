@@ -323,19 +323,6 @@ public class UAVManagementAppService {
         airspaceRepository.save(airspace);
     }
 
-    // 业务规则校验
-        validateAirspaceExists(airspaceId);
-
-        // 获取空域
-        Airspace airspace = airspaceRepository.findById(airspaceId);
-
-        // 获取无人机
-        UAV uav = airspace.getUAV(uavId);
-        if (uav == null) {
-            throw new RuntimeException("无人机不存在: " + uavId);
-        }
-    }
-
     /**
      * 创建无人机
      *

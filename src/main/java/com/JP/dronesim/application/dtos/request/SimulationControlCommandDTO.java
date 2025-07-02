@@ -5,7 +5,7 @@ import javax.validation.constraints.NotNull;
 
 /**
  * 仿真控制指令DTO
- * 用于初始化仿真控制指�?(start/pause/stop)
+ * 用于初始化仿真控制指令(start/pause/stop)
  *
  * @author JP Team
  * @version 1.0
@@ -13,10 +13,10 @@ import javax.validation.constraints.NotNull;
 public class SimulationControlCommandDTO {
 
     /**
-     * 时间步长（秒�?
+     * 时间步长（秒）
      */
     @NotNull(message = "时间步长不能为空")
-    @DecimalMin(value = "0.1", message = "时间步长必须大于0.1�?)
+    @DecimalMin(value = "0.1", message = "时间步长必须大于0.1")
     private Double timeStep;
 
     /**
@@ -42,13 +42,13 @@ public class SimulationControlCommandDTO {
     private Double maxSimulationTime;
 
     /**
-     * 默认构造函�?
+     * 默认构造函数
      */
     public SimulationControlCommandDTO() {
     }
 
     /**
-     * 构造函�?
+     * 构造函数
      *
      * @param timeStep 时间步长
      */
@@ -57,7 +57,7 @@ public class SimulationControlCommandDTO {
     }
 
     /**
-     * 构造函�?
+     * 构造函数
      *
      * @param timeStep 时间步长
      * @param commandType 控制指令类型
@@ -142,18 +142,18 @@ public class SimulationControlCommandDTO {
     }
 
     /**
-     * 获取最大仿真时�?
+     * 获取最大仿真时间
      *
-     * @return 最大仿真时�?
+     * @return 最大仿真时间
      */
     public Double getMaxSimulationTime() {
         return maxSimulationTime;
     }
 
     /**
-     * 设置最大仿真时�?
+     * 设置最大仿真时间
      *
-     * @param maxSimulationTime 最大仿真时�?
+     * @param maxSimulationTime 最大仿真时间
      */
     public void setMaxSimulationTime(Double maxSimulationTime) {
         this.maxSimulationTime = maxSimulationTime;

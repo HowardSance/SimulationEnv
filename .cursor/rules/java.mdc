@@ -1,11 +1,6 @@
 ---
-description: 
-globs: 
-alwaysApply: true
----
----
 description: java开发规范
-globs: 
+globs: true
 alwaysApply: true
 ---
 # Java开发规范
@@ -109,5 +104,8 @@ public ProviderEntity findProvider(String providerId, String userId) {
 
 11注释规范
 - 每个类中的字段以及方法都需要 javadoc 注释说明
+
+12代码简洁
+- 代码应尽量保持可读性和简洁，避免过度设计
 
 

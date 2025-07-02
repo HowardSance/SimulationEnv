@@ -6,8 +6,8 @@ import com.JP.dronesim.domain.common.valueobjects.Position;
 import com.JP.dronesim.domain.common.valueobjects.Velocity;
 import com.JP.dronesim.domain.device.model.AbstractProbeDevice;
 import com.JP.dronesim.domain.device.model.common.SensorParameters;
-import com.JP.dronesim.domain.device.model.common.events.DetectionEvent;
-import com.JP.dronesim.domain.uav.model.AirspaceEnvironment;
+import com.JP.dronesim.domain.device.model.events.DetectionEvent;
+import com.JP.dronesim.domain.airspace.model.Airspace;
 import com.JP.dronesim.domain.uav.model.UAV;
 
 import java.time.LocalDateTime;
@@ -57,7 +57,7 @@ public class ElectromagneticRadar extends AbstractProbeDevice {
      * 构造函数
      */
     public ElectromagneticRadar() {
-        super(DeviceType.ELECTROMAGNETIC_RADAR);
+        super(DeviceType.RADAR);
         this.currentScanAngle = 0.0;
         this.scanDirection = 1;
         this.historicalContacts = new HashMap<>();
@@ -75,7 +75,7 @@ public class ElectromagneticRadar extends AbstractProbeDevice {
      * @return List<RadarContact> 雷达探测到的目标列表，包含距离、方位、速度信息
      * @throws IllegalStateException 如果设备未初始化或非活跃状态
      */
-    public List<RadarContact> scanArea(AirspaceEnvironment airspace, List<UAV> uavs) {
+    public List<RadarContact> scanArea(Airspace airspace, List<UAV> uavs) {
         if (!isInitialized()) {
             throw new IllegalStateException("雷达设备未初始化");
         }
@@ -203,7 +203,7 @@ public class ElectromagneticRadar extends AbstractProbeDevice {
     }
     
     @Override
-    protected List<DetectionEvent> doPerformDetection(AirspaceEnvironment airspace, List<UAV> uavs) {
+    protected List<DetectionEvent> doPerformDetection(Airspace airspace, List<UAV> uavs) {
         List<DetectionEvent> detectionEvents = new ArrayList<>();
         
         try {
@@ -212,33 +212,53 @@ public class ElectromagneticRadar extends AbstractProbeDevice {
             
             // 将雷达接触转换为探测事件
             for (RadarContact contact : contacts) {
-                DetectionEvent event = new DetectionEvent(
-                        UUID.randomUUID().toString(), contact.getDetectionTime(),
-                        this.getId(), this.getName(),
-                        contact.getTargetId() != null ? contact.getTargetId() : "UNKNOWN",
-                        contact.getClassification().getDescription(),
-                        contact.getWorldPosition(), contact.getConfidence(),
-                        contact.getRange(),
-                        String.format("雷达探测到目标，距离:%.1fm，方位:%.1f°，径向速度:%.1fm/s，信噪比:%.1fdB",
-                                     contact.getRange(), contact.getAzimuth(), 
-                                     contact.getRadialVelocity(), contact.getSignalToNoiseRatio())
+                // 使用工厂方法创建探测事件，简化参数
+                DetectionEvent event = DetectionEvent.create(
+                    this.getId(),                           // 探测器ID
+                    this.getName(),                         // 探测器名称
+                    DeviceType.RADAR,                       // 设备类型
+                    contact.getTargetId(),                  // 被探测UAV的ID
+                    null,                                   // UAV名称（可为空）
+                    contact.getWorldPosition(),             // 探测位置
+                    contact.getConfidence(),                // 置信度
+                    contact.getRange(),                     // 探测距离
+                    generateRadarDescription(contact)       // 描述信息
                 );
+                
                 detectionEvents.add(event);
             }
             
         } catch (Exception e) {
-            // 记录错误事件
-            DetectionEvent errorEvent = new DetectionEvent(
-                    UUID.randomUUID().toString(), LocalDateTime.now(),
-                    this.getId(), this.getName(),
-                    "ERROR", "雷达扫描错误",
-                    this.getPosition(), 0.0, 0.0,
-                    "雷达扫描过程中发生错误: " + e.getMessage()
+            // 记录错误事件 - 使用简化的创建方法
+            DetectionEvent errorEvent = DetectionEvent.create(
+                this.getId(),
+                this.getName(),
+                DeviceType.RADAR,
+                "ERROR",                        // 错误目标ID
+                "系统错误",                      // 错误描述作为UAV名称
+                this.getPosition(),             // 雷达自身位置
+                0.0,                           // 置信度为0
+                0.0,                           // 距离为0
+                "雷达扫描过程中发生错误: " + e.getMessage()
             );
             detectionEvents.add(errorEvent);
         }
         
         return detectionEvents;
+    }
+    
+    /**
+     * 生成雷达探测描述信息
+     * 
+     * @param contact 雷达接触信息
+     * @return 格式化的描述字符串
+     */
+    private String generateRadarDescription(RadarContact contact) {
+        return String.format("雷达探测 - 距离:%.1fm, 方位:%.1f°, 径向速度:%.1fm/s, 信噪比:%.1fdB", 
+                            contact.getRange(), 
+                            contact.getAzimuth(), 
+                            contact.getRadialVelocity(), 
+                            contact.getSignalToNoiseRatio());
     }
     
     @Override
@@ -267,12 +287,47 @@ public class ElectromagneticRadar extends AbstractProbeDevice {
         resetScanState();
     }
     
+    @Override
+    public void updateParameters(java.util.Map<String, Object> paramMap) {
+        // 简化的参数更新实现
+        if (paramMap == null || paramMap.isEmpty()) {
+            return;
+        }
+        
+        try {
+            // 更新基础参数
+            if (paramMap.containsKey("detectionRange")) {
+                Object value = paramMap.get("detectionRange");
+                if (value instanceof Number) {
+                    this.setDetectionRange(((Number) value).doubleValue());
+                }
+            }
+            
+            if (paramMap.containsKey("fieldOfView")) {
+                Object value = paramMap.get("fieldOfView");
+                if (value instanceof Number) {
+                    this.setFieldOfView(((Number) value).doubleValue());
+                }
+            }
+            
+            if (paramMap.containsKey("orientation")) {
+                Object value = paramMap.get("orientation");
+                if (value instanceof Number) {
+                    this.setOrientation(((Number) value).doubleValue());
+                }
+            }
+            
+        } catch (Exception e) {
+            throw new IllegalArgumentException("参数更新失败: " + e.getMessage(), e);
+        }
+    }
+    
     // ================ 私有扫描实现方法 ================
     
     /**
      * 执行固定角度扫描
      */
-    private List<RadarContact> performFixedScan(AirspaceEnvironment airspace, List<UAV> uavs, 
+    private List<RadarContact> performFixedScan(Airspace airspace, List<UAV> uavs, 
                                               RadarParameters params) {
         List<RadarContact> contacts = new ArrayList<>();
         
@@ -290,7 +345,7 @@ public class ElectromagneticRadar extends AbstractProbeDevice {
     /**
      * 执行扇形扫描
      */
-    private List<RadarContact> performSectorScan(AirspaceEnvironment airspace, List<UAV> uavs, 
+    private List<RadarContact> performSectorScan(Airspace airspace, List<UAV> uavs, 
                                                RadarParameters params) {
         List<RadarContact> contacts = new ArrayList<>();
         
@@ -325,7 +380,7 @@ public class ElectromagneticRadar extends AbstractProbeDevice {
     /**
      * 执行360度扫描
      */
-    private List<RadarContact> perform360DegreeScan(AirspaceEnvironment airspace, List<UAV> uavs, 
+    private List<RadarContact> perform360DegreeScan(Airspace airspace, List<UAV> uavs, 
                                                   RadarParameters params) {
         List<RadarContact> contacts = new ArrayList<>();
         
@@ -352,10 +407,10 @@ public class ElectromagneticRadar extends AbstractProbeDevice {
     /**
      * 计算雷达接触
      */
-    private RadarContact calculateRadarContact(UAV uav, AirspaceEnvironment airspace, 
+    private RadarContact calculateRadarContact(UAV uav, Airspace airspace,
                                              RadarParameters params, double scanAngle) {
         Position radarPos = this.getPosition();
-        Position uavPos = uav.getCurrentPosition();
+        Position uavPos = uav.getPosition();
         
         // 计算距离
         double range = calculateDistance(radarPos, uavPos);
@@ -371,7 +426,7 @@ public class ElectromagneticRadar extends AbstractProbeDevice {
         double elevation = angles[1];
         
         // 计算径向速度
-        Velocity uavVel = uav.getCurrentVelocity();
+        Velocity uavVel = uav.getVelocity();
         double radialVelocity = calculateRadialVelocity(radarPos, uavPos, uavVel);
         
         // 计算雷达截面积（简化模型）
@@ -490,7 +545,7 @@ public class ElectromagneticRadar extends AbstractProbeDevice {
      * 计算信噪比
      */
     private double calculateSignalToNoiseRatio(double range, double rcs, RadarParameters params, 
-                                             AirspaceEnvironment airspace) {
+                                             Airspace airspace) {
         // 雷达方程: SNR = (Pt * Gt * Gr * λ² * σ) / ((4π)³ * R⁴ * Pn)
         double wavelength = 3e8 / params.getFrequency();
         double pt = params.getPower();
@@ -518,7 +573,7 @@ public class ElectromagneticRadar extends AbstractProbeDevice {
     /**
      * 计算大气损耗
      */
-    private double calculateAtmosphericLoss(double range, double frequency, AirspaceEnvironment airspace) {
+    private double calculateAtmosphericLoss(double range, double frequency, Airspace airspace) {
         // 简化的大气损耗模型
         double rangeKm = range / 1000.0;
         double freqGHz = frequency / 1e9;
@@ -579,4 +634,4 @@ public class ElectromagneticRadar extends AbstractProbeDevice {
             }
         }
     }
-} 
+}

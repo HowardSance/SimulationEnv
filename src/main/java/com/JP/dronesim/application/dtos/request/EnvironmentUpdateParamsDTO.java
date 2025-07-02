@@ -5,7 +5,7 @@ import javax.validation.constraints.DecimalMax;
 
 /**
  * 环境更新参数DTO
- * 用于动��更新环境参�?
+ * 用于动态更新环境参数
  *
  * @author JP Team
  * @version 1.0
@@ -13,30 +13,30 @@ import javax.validation.constraints.DecimalMax;
 public class EnvironmentUpdateParamsDTO {
 
     /**
-     * 温度（摄氏度�?
+     * 温度（摄氏度）
      */
-    @DecimalMin(value = "-100", message = "温度不能低于-100摄氏�?)
-    @DecimalMax(value = "100", message = "温度不能高于100摄氏�?)
+    @DecimalMin(value = "-100", message = "温度不能低于-100摄氏度")
+    @DecimalMax(value = "100", message = "温度不能高于100摄氏度")
     private Double temperature;
 
     /**
-     * 湿度（百分比�?
+     * 湿度（百分比）
      */
-    @DecimalMin(value = "0", message = "湿度不能为负�?)
+    @DecimalMin(value = "0", message = "湿度不能为负数")
     @DecimalMax(value = "100", message = "湿度不能超过100%")
     private Double humidity;
 
     /**
-     * 风��（�?秒）
+     * 风速（米/秒）
      */
-    @DecimalMin(value = "0", message = "风��不能为负数")
+    @DecimalMin(value = "0", message = "风速不能为负数")
     private Double windSpeed;
 
     /**
-     * 风向（度�?
+     * 风向（度）
      */
-    @DecimalMin(value = "0", message = "风向角度不能为负�?)
-    @DecimalMax(value = "360", message = "风向角度不能超过360�?)
+    @DecimalMin(value = "0", message = "风向角度不能为负数")
+    @DecimalMax(value = "360", message = "风向角度不能超过360度")
     private Double windDirection;
 
     /**
@@ -46,42 +46,42 @@ public class EnvironmentUpdateParamsDTO {
     private Double visibility;
 
     /**
-     * 气压（帕斯卡�?
+     * 气压（帕斯卡）
      */
-    @DecimalMin(value = "0", message = "气压不能为负�?)
+    @DecimalMin(value = "0", message = "气压不能为负数")
     private Double pressure;
 
     /**
      * 云层覆盖率（百分比）
      */
     @DecimalMin(value = "0", message = "云层覆盖率不能为负数")
-    @DecimalMax(value = "100", message = "云层覆盖率不能超�?00%")
+    @DecimalMax(value = "100", message = "云层覆盖率不能超过100%")
     private Double cloudCover;
 
     /**
-     * 降水强度（毫�?小时�?
+     * 降水强度（毫米/小时）
      */
-    @DecimalMin(value = "0", message = "降水强度不能为负�?)
+    @DecimalMin(value = "0", message = "降水强度不能为负数")
     private Double precipitation;
 
     /**
      * 大气湍流强度
      */
-    @DecimalMin(value = "0", message = "大气湍流强度不能为负�?)
+    @DecimalMin(value = "0", message = "大气湍流强度不能为负数")
     private Double turbulence;
 
     /**
-     * 默认构��函�?
+     * 默认构造函数
      */
     public EnvironmentUpdateParamsDTO() {
     }
 
     /**
-     * 构��函�?
+     * 构造函数
      *
      * @param temperature 温度
      * @param humidity 湿度
-     * @param windSpeed 风��?
+     * @param windSpeed 风速
      * @param windDirection 风向
      */
     public EnvironmentUpdateParamsDTO(Double temperature, Double humidity,
@@ -129,18 +129,18 @@ public class EnvironmentUpdateParamsDTO {
     }
 
     /**
-     * 获取风��?
+     * 获取风速
      *
-     * @return 风��?
+     * @return 风速
      */
     public Double getWindSpeed() {
         return windSpeed;
     }
 
     /**
-     * 设置风��?
+     * 设置风速
      *
-     * @param windSpeed 风��?
+     * @param windSpeed 风速
      */
     public void setWindSpeed(Double windSpeed) {
         this.windSpeed = windSpeed;
@@ -165,18 +165,18 @@ public class EnvironmentUpdateParamsDTO {
     }
 
     /**
-     * 获取能见�?
+     * 获取能见度
      *
-     * @return 能见�?
+     * @return 能见度
      */
     public Double getVisibility() {
         return visibility;
     }
 
     /**
-     * 设置能见�?
+     * 设置能见度
      *
-     * @param visibility 能见�?
+     * @param visibility 能见度
      */
     public void setVisibility(Double visibility) {
         this.visibility = visibility;
@@ -201,18 +201,16 @@ public class EnvironmentUpdateParamsDTO {
     }
 
     /**
-     * 获取云层覆盖�?
-     *
-     * @return 云层覆盖�?
+     * 获取云层覆盖率
      */
     public Double getCloudCover() {
         return cloudCover;
     }
 
     /**
-     * 设置云层覆盖�?
+     * 设置云层覆盖率
      *
-     * @param cloudCover 云层覆盖�?
+     * @param cloudCover 云层覆盖率
      */
     public void setCloudCover(Double cloudCover) {
         this.cloudCover = cloudCover;

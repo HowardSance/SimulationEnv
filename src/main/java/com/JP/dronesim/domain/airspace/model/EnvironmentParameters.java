@@ -81,6 +81,26 @@ public class EnvironmentParameters {
 
     /**
      * 构造函数
+     */
+    public EnvironmentParameters() {
+        this.temperature = 20.0;
+        this.humidity = 0.6;
+        this.windSpeed = 3.0;
+        this.windDirection = 180.0;
+        this.atmosphericPressure = 101325.0;
+        this.visibility = 10000.0;
+        this.lightIntensity = 0.8;
+        this.sunElevation = 45.0;
+        this.sunAzimuth = 180.0;
+        this.cloudCover = 0.2;
+        this.precipitationRate = 0.0;
+        this.atmosphericClarity = 0.9;
+        this.isNightTime = false;
+    }
+
+    /**
+     * 构造函数
+     *
      *
      * @param temperature 环境温度
      * @param humidity 相对湿度

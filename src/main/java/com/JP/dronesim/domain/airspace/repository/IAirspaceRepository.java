@@ -13,41 +13,15 @@ import java.util.Optional;
  */
 public interface IAirspaceRepository {
     /**
-     * 保存空域
-     *
+     * 保存唯一空域
      * @param airspace 空域实体
      * @return 保存后的空域实体
      */
     Airspace save(Airspace airspace);
 
     /**
-     * 根据ID查找空域
-     *
-     * @param id 空域ID
-     * @return 空域实体，如果不存在则返回空
+     * 获取唯一空域
+     * @return 空域实体（如不存在返回Optional.empty）
      */
-    Optional<Airspace> findById(String id);
-
-    /**
-     * 查找所有空域
-     *
-     * @return 所有空域列表
-     */
-    List<Airspace> findAll();
-
-    /**
-     * 删除空域
-     *
-     * @param id 空域ID
-     * @return 是否删除成功
-     */
-    boolean deleteById(String id);
-
-    /**
-     * 检查空域是否存在
-     *
-     * @param id 空域ID
-     * @return 是否存在
-     */
-    boolean existsById(String id);
+    Optional<Airspace> find();
 }
