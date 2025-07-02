@@ -3,14 +3,12 @@ package com.JP.dronesim.application.dtos.request;
 import com.JP.dronesim.domain.common.valueobjects.Position;
 import com.JP.dronesim.domain.common.valueobjects.Velocity;
 import com.JP.dronesim.domain.common.valueobjects.Orientation;
-import com.JP.dronesim.domain.uav.model.PhysicalProperties;
-
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
  * 无人机状态DTO
- * 用于初始化无人机状�?
+ * 用于初始化无人机状态
  *
  * @author JP Team
  * @version 1.0
@@ -23,14 +21,14 @@ public class UAVStateDTO {
     private String id;
 
     /**
-     * 无人机名�?
+     * 无人机名称
      */
     private String name;
 
     /**
-     * 无人机位�?
+     * 无人机位置
      */
-    @NotNull(message = "无人机位置不能为�?)
+    @NotNull(message = "无人机位置不能为空")
     private Position position;
 
     /**
@@ -40,20 +38,15 @@ public class UAVStateDTO {
     private Velocity velocity;
 
     /**
-     * 无人机姿�?
+     * 无人机姿态
      */
-    @NotNull(message = "无人机姿态不能为�?)
+    @NotNull(message = "无人机姿态不能为空")
     private Orientation orientation;
 
     /**
-     * 无人机状�?
+     * 无人机状态
      */
     private String status;
-
-    /**
-     * 无人机物理特�?
-     */
-    private PhysicalProperties physicalProperties;
 
     /**
      * 飞行路径
@@ -76,24 +69,24 @@ public class UAVStateDTO {
     private Double maxAltitude;
 
     /**
-     * 电池电量（百分比�?
+     * 电池电量（百分比）
      */
     private Double batteryLevel;
 
     /**
-     * 默认构造函�?
+     * 默认构造函数
      */
     public UAVStateDTO() {
     }
 
     /**
-     * 构造函�?
+     * 构造函数
      *
      * @param id 无人机ID
-     * @param name 无人机名�?
-     * @param position 无人机位�?
+     * @param name 无人机名称
+     * @param position 无人机位置
      * @param velocity 无人机速度
-     * @param orientation 无人机姿�?
+     * @param orientation 无人机姿态
      */
     public UAVStateDTO(String id, String name, Position position, Velocity velocity, Orientation orientation) {
         this.id = id;
@@ -122,36 +115,36 @@ public class UAVStateDTO {
     }
 
     /**
-     * 获取无人机名�?
+     * 获取无人机名称
      *
-     * @return 无人机名�?
+     * @return 无人机名称
      */
     public String getName() {
         return name;
     }
 
     /**
-     * 设置无人机名�?
+     * 设置无人机名称
      *
-     * @param name 无人机名�?
+     * @param name 无人机名称
      */
     public void setName(String name) {
         this.name = name;
     }
 
     /**
-     * 获取无人机位�?
+     * 获取无人机位置
      *
-     * @return 无人机位�?
+     * @return 无人机位置
      */
     public Position getPosition() {
         return position;
     }
 
     /**
-     * 设置无人机位�?
+     * 设置无人机位置
      *
-     * @param position 无人机位�?
+     * @param position 无人机位置
      */
     public void setPosition(Position position) {
         this.position = position;
@@ -176,57 +169,37 @@ public class UAVStateDTO {
     }
 
     /**
-     * 获取无人机姿�?
-     *
-     * @return 无人机姿�?
+     * 获取无人机姿态
      */
     public Orientation getOrientation() {
         return orientation;
     }
 
     /**
-     * 设置无人机姿�?
+     * 设置无人机姿态
      *
-     * @param orientation 无人机姿�?
+     * @param orientation 无人机姿态
      */
     public void setOrientation(Orientation orientation) {
         this.orientation = orientation;
     }
 
     /**
-     * 获取无人机状�?
+     * 获取无人机状态
      *
-     * @return 无人机状�?
+     * @return 无人机状态
      */
     public String getStatus() {
         return status;
     }
 
     /**
-     * 设置无人机状�?
+     * 设置无人机状态
      *
-     * @param status 无人机状�?
+     * @param status 无人机状态
      */
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    /**
-     * 获取无人机物理特�?
-     *
-     * @return 无人机物理特�?
-     */
-    public PhysicalProperties getPhysicalProperties() {
-        return physicalProperties;
-    }
-
-    /**
-     * 设置无人机物理特�?
-     *
-     * @param physicalProperties 无人机物理特�?
-     */
-    public void setPhysicalProperties(PhysicalProperties physicalProperties) {
-        this.physicalProperties = physicalProperties;
     }
 
     /**
@@ -284,18 +257,18 @@ public class UAVStateDTO {
     }
 
     /**
-     * 获取最大高�?
+     * 获取最大高度
      *
-     * @return 最大高�?
+     * @return 最大高度
      */
     public Double getMaxAltitude() {
         return maxAltitude;
     }
 
     /**
-     * 设置最大高�?
+     * 设置最大高度
      *
-     * @param maxAltitude 最大高�?
+     * @param maxAltitude 最大高度
      */
     public void setMaxAltitude(Double maxAltitude) {
         this.maxAltitude = maxAltitude;
@@ -328,7 +301,6 @@ public class UAVStateDTO {
                 ", velocity=" + velocity +
                 ", orientation=" + orientation +
                 ", status='" + status + '\'' +
-                ", physicalProperties=" + physicalProperties +
                 ", waypoints=" + waypoints +
                 ", maxSpeed=" + maxSpeed +
                 ", maxAcceleration=" + maxAcceleration +

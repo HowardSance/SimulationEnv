@@ -11,7 +11,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 /**
- * 无人机管理REST控制�?
+* 无人机管理REST控制器
  * 处理无人机的部署、删除、修改、飞行路径设置等操作
  *
  * @author JP Team
@@ -25,11 +25,11 @@ public class UavController {
     private UAVManagementAppService uavManagementAppService;
 
     /**
-     * 部署无人�?
+     * 部署无人机
      *
      * @param airspaceId 空域ID
-     * @param uavState 无人机状�?
-     * @return 无人机状�?
+     * @param uavState 无人机状态
+     * @return 无人机状态
      */
     @PostMapping
     public ResponseEntity<EntityStateDTO> deployUAV(
@@ -44,11 +44,11 @@ public class UavController {
     }
 
     /**
-     * 批量部署无人�?
+     * 批量部署无人机
      *
      * @param airspaceId 空域ID
-     * @param uavStates 无人机状态列�?
-     * @return 无人机状态列�?
+     * @param uavStates 无人机状态列表
+     * @return 无人机状态列表
      */
     @PostMapping("/batch")
     public ResponseEntity<List<EntityStateDTO>> batchDeployUAVs(
@@ -63,11 +63,11 @@ public class UavController {
     }
 
     /**
-     * 获取无人机状�?
+     * 获取无人机状态
      *
      * @param airspaceId 空域ID
      * @param uavId 无人机ID
-     * @return 无人机状�?
+     * @return 无人机状态
      */
     @GetMapping("/{uavId}")
     public ResponseEntity<EntityStateDTO> getUAV(
@@ -85,7 +85,7 @@ public class UavController {
      * 获取空域内所有无人机
      *
      * @param airspaceId 空域ID
-     * @return 无人机列�?
+     * @return 无人机列表
      */
     @GetMapping
     public ResponseEntity<List<EntityStateDTO>> getAllUAVs(@PathVariable String airspaceId) {
@@ -98,11 +98,11 @@ public class UavController {
     }
 
     /**
-     * 更新无人机状�?
+     * 更新无人机状态
      *
      * @param airspaceId 空域ID
      * @param uavId 无人机ID
-     * @param uavState 无人机状�?
+     * @param uavState 无人机状态
      * @return 更新结果
      */
     @PutMapping("/{uavId}")
@@ -112,14 +112,14 @@ public class UavController {
             @RequestBody @Valid UAVStateDTO uavState) {
         try {
             uavManagementAppService.updateUAV(airspaceId, uavId, uavState);
-            return ResponseEntity.ok("无人机状态更新成�?);
+            return ResponseEntity.ok("无人机状态更新成功");
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
     /**
-     * 设置无人机飞行路�?
+     * 设置无人机飞行路径
      *
      * @param airspaceId 空域ID
      * @param uavId 无人机ID
@@ -140,7 +140,7 @@ public class UavController {
     }
 
     /**
-     * 获取无人机飞行路�?
+    * 获取无人机飞行路径
      *
      * @param airspaceId 空域ID
      * @param uavId 无人机ID
@@ -159,7 +159,7 @@ public class UavController {
     }
 
     /**
-     * 控制无人机起�?
+     * 控制无人机起飞
      *
      * @param airspaceId 空域ID
      * @param uavId 无人机ID
@@ -171,14 +171,14 @@ public class UavController {
             @PathVariable String uavId) {
         try {
             uavManagementAppService.takeoffUAV(airspaceId, uavId);
-            return ResponseEntity.ok("无人机起飞成�?);
+            return ResponseEntity.ok("无人机起飞成功");
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
     /**
-     * 控制无人机降�?
+     * 控制无人机降落
      *
      * @param airspaceId 空域ID
      * @param uavId 无人机ID
@@ -190,14 +190,14 @@ public class UavController {
             @PathVariable String uavId) {
         try {
             uavManagementAppService.landUAV(airspaceId, uavId);
-            return ResponseEntity.ok("无人机降落成�?);
+            return ResponseEntity.ok("无人机降落成功");
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
     /**
-     * 控制无人机悬�?
+     * 控制无人机悬停
      *
      * @param airspaceId 空域ID
      * @param uavId 无人机ID
@@ -209,14 +209,14 @@ public class UavController {
             @PathVariable String uavId) {
         try {
             uavManagementAppService.hoverUAV(airspaceId, uavId);
-            return ResponseEntity.ok("无人机悬停成�?);
+            return ResponseEntity.ok("无人机悬停成功");
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
     /**
-     * 删除无人�?
+     * 删除无人机
      *
      * @param airspaceId 空域ID
      * @param uavId 无人机ID
@@ -228,18 +228,18 @@ public class UavController {
             @PathVariable String uavId) {
         try {
             uavManagementAppService.removeUAV(airspaceId, uavId);
-            return ResponseEntity.ok("无人机删除成�?);
+            return ResponseEntity.ok("无人机删除成功");
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
     /**
-     * 获取无人机物理特�?
+     * 获取无人机物理特性
      *
      * @param airspaceId 空域ID
      * @param uavId 无人机ID
-     * @return 物理特�?
+    * @return 物理特性
      */
     @GetMapping("/{uavId}/properties")
     public ResponseEntity<Object> getUAVProperties(

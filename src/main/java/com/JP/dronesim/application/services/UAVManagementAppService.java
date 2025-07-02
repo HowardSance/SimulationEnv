@@ -18,7 +18,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
- * 无人机管理应用服�?
+ * 无人机管理应用服务
  * 负责无人机的部署、删除、修改、飞行路径设置等用例协调
  *
  * @author JP Team
@@ -31,11 +31,11 @@ public class UAVManagementAppService {
     private IAirspaceRepository airspaceRepository;
 
     /**
-     * 部署无人�?
+     * 部署无人机
      *
      * @param airspaceId 空域ID
-     * @param uavState 无人机状�?
-     * @return 无人机状�?
+     * @param uavState 无人机状态
+     * @return 无人机状态
      */
     public EntityStateDTO deployUAV(String airspaceId, UAVStateDTO uavState) {
         // 业务规则校验
@@ -45,13 +45,13 @@ public class UAVManagementAppService {
         // 获取空域
         Airspace airspace = airspaceRepository.findById(airspaceId);
 
-        // 校验无人机位置是否在空域边界�?
+        // 校验无人机位置是否在空域边界
         validateUAVPosition(airspace, uavState.getPosition());
 
-        // 创建无人�?
+        // 创建无人机
         UAV uav = createUAV(uavState);
 
-        // 添加到空�?
+        // 添加到空域
         airspace.addEntity(uav);
         airspaceRepository.save(airspace);
 
@@ -60,11 +60,11 @@ public class UAVManagementAppService {
     }
 
     /**
-     * 批量部署无人�?
+     * 批量部署无人机
      *
      * @param airspaceId 空域ID
-     * @param uavStates 无人机状态列�?
-     * @return 无人机状态列�?
+     * @param uavStates 无人机状态列表
+     * @return 无人机状态列表
      */
     public List<EntityStateDTO> batchDeployUAVs(String airspaceId, List<UAVStateDTO> uavStates) {
         // 业务规则校验
@@ -74,7 +74,7 @@ public class UAVManagementAppService {
         // 获取空域
         Airspace airspace = airspaceRepository.findById(airspaceId);
 
-        // 批量创建无人�?
+        // 批量创建无人机
         List<UAV> uavs = uavStates.stream()
                 .map(state -> {
                     validateUAVPosition(airspace, state.getPosition());
@@ -82,7 +82,7 @@ public class UAVManagementAppService {
                 })
                 .collect(Collectors.toList());
 
-        // 批量添加到空�?
+        // 批量添加到空域
         uavs.forEach(airspace::addEntity);
         airspaceRepository.save(airspace);
 
@@ -93,11 +93,11 @@ public class UAVManagementAppService {
     }
 
     /**
-     * 获取无人机状�?
+     * 获取无人机状态
      *
      * @param airspaceId 空域ID
      * @param uavId 无人机ID
-     * @return 无人机状�?
+    * @return 无人机状态
      */
     public EntityStateDTO getUAV(String airspaceId, String uavId) {
         // 业务规则校验
@@ -106,7 +106,7 @@ public class UAVManagementAppService {
         // 获取空域
         Airspace airspace = airspaceRepository.findById(airspaceId);
 
-        // 获取无人�?
+        // 获取无人机
         UAV uav = airspace.getUAV(uavId);
         if (uav == null) {
             throw new RuntimeException("无人机不存在: " + uavId);
@@ -120,7 +120,7 @@ public class UAVManagementAppService {
      * 获取空域内所有无人机
      *
      * @param airspaceId 空域ID
-     * @return 无人机列�?
+     * @return 无人机列表
      */
     public List<EntityStateDTO> getAllUAVs(String airspaceId) {
         // 业务规则校验
@@ -139,11 +139,11 @@ public class UAVManagementAppService {
     }
 
     /**
-     * 更新无人机状�?
+     * 更新无人机状态
      *
      * @param airspaceId 空域ID
      * @param uavId 无人机ID
-     * @param uavState 无人机状�?
+     * @param uavState 无人机状态
      */
     public void updateUAV(String airspaceId, String uavId, UAVStateDTO uavState) {
         // 业务规则校验
@@ -153,16 +153,16 @@ public class UAVManagementAppService {
         // 获取空域
         Airspace airspace = airspaceRepository.findById(airspaceId);
 
-        // 获取无人�?
+        // 获取无人机
         UAV uav = airspace.getUAV(uavId);
         if (uav == null) {
             throw new RuntimeException("无人机不存在: " + uavId);
         }
 
-        // 校验新位置是否在空域边界�?
+        // 校验新位置是否在空域边界
         validateUAVPosition(airspace, uavState.getPosition());
 
-        // 更新无人机状�?
+        // 更新无人机状态
         uav.setPosition(uavState.getPosition());
         uav.setVelocity(uavState.getVelocity());
         uav.setOrientation(uavState.getOrientation());
@@ -173,7 +173,7 @@ public class UAVManagementAppService {
     }
 
     /**
-     * 设置无人机飞行路�?
+     * 设置无人机飞行路径
      *
      * @param airspaceId 空域ID
      * @param uavId 无人机ID
@@ -187,7 +187,7 @@ public class UAVManagementAppService {
         // 获取空域
         Airspace airspace = airspaceRepository.findById(airspaceId);
 
-        // 获取无人�?
+        // 获取无人机
         UAV uav = airspace.getUAV(uavId);
         if (uav == null) {
             throw new RuntimeException("无人机不存在: " + uavId);
@@ -204,7 +204,7 @@ public class UAVManagementAppService {
     }
 
     /**
-     * 获取无人机飞行路�?
+     * 获取无人机飞行路径
      *
      * @param airspaceId 空域ID
      * @param uavId 无人机ID
@@ -217,7 +217,7 @@ public class UAVManagementAppService {
         // 获取空域
         Airspace airspace = airspaceRepository.findById(airspaceId);
 
-        // 获取无人�?
+        // 获取无人机
         UAV uav = airspace.getUAV(uavId);
         if (uav == null) {
             throw new RuntimeException("无人机不存在: " + uavId);
@@ -228,7 +228,7 @@ public class UAVManagementAppService {
     }
 
     /**
-     * 控制无人机起�?
+        * 控制无人机起飞
      *
      * @param airspaceId 空域ID
      * @param uavId 无人机ID
@@ -240,7 +240,7 @@ public class UAVManagementAppService {
         // 获取空域
         Airspace airspace = airspaceRepository.findById(airspaceId);
 
-        // 获取无人�?
+        // 获取无人机
         UAV uav = airspace.getUAV(uavId);
         if (uav == null) {
             throw new RuntimeException("无人机不存在: " + uavId);
@@ -254,7 +254,7 @@ public class UAVManagementAppService {
     }
 
     /**
-     * 控制无人机降�?
+     * 控制无人机降落
      *
      * @param airspaceId 空域ID
      * @param uavId 无人机ID
@@ -266,7 +266,7 @@ public class UAVManagementAppService {
         // 获取空域
         Airspace airspace = airspaceRepository.findById(airspaceId);
 
-        // 获取无人�?
+        // 获取无人机
         UAV uav = airspace.getUAV(uavId);
         if (uav == null) {
             throw new RuntimeException("无人机不存在: " + uavId);
@@ -280,7 +280,7 @@ public class UAVManagementAppService {
     }
 
     /**
-     * 控制无人机悬�?
+     * 控制无人机悬停
      *
      * @param airspaceId 空域ID
      * @param uavId 无人机ID
@@ -292,7 +292,7 @@ public class UAVManagementAppService {
         // 获取空域
         Airspace airspace = airspaceRepository.findById(airspaceId);
 
-        // 获取无人�?
+        // 获取无人机
         UAV uav = airspace.getUAV(uavId);
         if (uav == null) {
             throw new RuntimeException("无人机不存在: " + uavId);
@@ -306,7 +306,7 @@ public class UAVManagementAppService {
     }
 
     /**
-     * 删除无人�?
+     * 删除无人机
      *
      * @param airspaceId 空域ID
      * @param uavId 无人机ID
@@ -318,40 +318,29 @@ public class UAVManagementAppService {
         // 获取空域
         Airspace airspace = airspaceRepository.findById(airspaceId);
 
-        // 删除无人�?
+        // 删除无人机
         airspace.removeEntity(uavId);
         airspaceRepository.save(airspace);
     }
 
-    /**
-     * 获取无人机物理特�?
-     *
-     * @param airspaceId 空域ID
-     * @param uavId 无人机ID
-     * @return 物理特�?
-     */
-    public Object getUAVProperties(String airspaceId, String uavId) {
-        // 业务规则校验
+    // 业务规则校验
         validateAirspaceExists(airspaceId);
 
         // 获取空域
         Airspace airspace = airspaceRepository.findById(airspaceId);
 
-        // 获取无人�?
+        // 获取无人机
         UAV uav = airspace.getUAV(uavId);
         if (uav == null) {
             throw new RuntimeException("无人机不存在: " + uavId);
         }
-
-        // 返回物理特�?
-        return uav.getPhysicalProperties();
     }
 
     /**
-     * 创建无人�?
+     * 创建无人机
      *
-     * @param uavState 无人机状�?
-     * @return 无人机实�?
+     * @param uavState 无人机状态
+     * @return 无人机
      */
     private UAV createUAV(UAVStateDTO uavState) {
         String uavId = uavState.getId() != null ? uavState.getId() : UUID.randomUUID().toString();
@@ -363,13 +352,12 @@ public class UAVManagementAppService {
         uav.setVelocity(uavState.getVelocity());
         uav.setOrientation(uavState.getOrientation());
         uav.setStatus(uavState.getStatus());
-        uav.setPhysicalProperties(uavState.getPhysicalProperties());
 
         return uav;
     }
 
     /**
-     * 转换为航�?
+     * 转换为航点
      *
      * @param waypointObj 航点对象
      * @return 航点
@@ -387,35 +375,35 @@ public class UAVManagementAppService {
      */
     private void validateAirspaceExists(String airspaceId) {
         if (!airspaceRepository.existsById(airspaceId)) {
-            throw new RuntimeException("空域不存�? " + airspaceId);
+            throw new RuntimeException("空域不存在: " + airspaceId);
         }
     }
 
     /**
-     * 校验无人机状�?
+     * 校验无人机状态
      *
-     * @param uavState 无人机状�?
+     * @param uavState 无人机状态
      */
     private void validateUAVState(UAVStateDTO uavState) {
         if (uavState.getPosition() == null) {
-            throw new RuntimeException("无人机位置不能为�?);
+            throw new RuntimeException("无人机位置不能为空");
         }
         if (uavState.getVelocity() == null) {
             throw new RuntimeException("无人机速度不能为空");
         }
         if (uavState.getOrientation() == null) {
-            throw new RuntimeException("无人机姿态不能为�?);
+            throw new RuntimeException("无人机姿态不能为空");
         }
     }
 
     /**
-     * 校验无人机状态列�?
+     * 校验无人机状态列表
      *
-     * @param uavStates 无人机状态列�?
+     * @param uavStates 无人机状态列表
      */
     private void validateUAVStateList(List<UAVStateDTO> uavStates) {
         if (uavStates == null || uavStates.isEmpty()) {
-            throw new RuntimeException("无人机状态列表不能为�?);
+            throw new RuntimeException("无人机状态列表不能为空");
         }
         uavStates.forEach(this::validateUAVState);
     }
@@ -434,10 +422,10 @@ public class UAVManagementAppService {
     }
 
     /**
-     * 校验无人机位�?
+     * 校验无人机位置
      *
      * @param airspace 空域
-     * @param position 无人机位�?
+     * @param position 无人机位置
      */
     private void validateUAVPosition(Airspace airspace, Position position) {
         Position min = airspace.getBoundaryMin();
@@ -446,14 +434,14 @@ public class UAVManagementAppService {
         if (position.getX() < min.getX() || position.getX() > max.getX() ||
             position.getY() < min.getY() || position.getY() > max.getY() ||
             position.getZ() < min.getZ() || position.getZ() > max.getZ()) {
-            throw new RuntimeException("无人机位置超出空域边�?);
+            throw new RuntimeException("无人机位置超出空域边界");
         }
     }
 
     /**
      * 转换为实体状态DTO
      *
-     * @param uav 无人�?
+     * @param uav 无人机
      * @return 实体状态DTO
      */
     private EntityStateDTO convertToEntityStateDTO(UAV uav) {
@@ -465,7 +453,6 @@ public class UAVManagementAppService {
         dto.setVelocity(uav.getVelocity());
         dto.setOrientation(uav.getOrientation());
         dto.setStatus(uav.getStatus().toString());
-        dto.setProperties(uav.getPhysicalProperties());
         return dto;
     }
 }
