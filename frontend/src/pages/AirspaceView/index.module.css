@@ -1,0 +1,86 @@
+/* 空域视图页面样式 */
+
+.layout {
+  height: 100vh;
+  background: #f0f2f5;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0;
+  background: #fff;
+}
+
+.sceneContainer {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.sceneControls {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.deploymentHint {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+.controlPanel {
+  height: 200px;
+  border-top: 1px solid #f0f0f0;
+  background: #fafafa;
+  overflow-y: auto;
+}
+
+.sider {
+  background: #fff;
+  border-left: 1px solid #f0f0f0;
+  overflow-y: auto;
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #f0f2f5;
+}
+
+.errorContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  padding: 24px;
+  background: #f0f2f5;
+}
+
+/* 响应式布局 */
+@media (max-width: 768px) {
+  .sceneControls {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+  }
+  
+  .controlPanel {
+    height: 150px;
+  }
+  
+  .sider {
+    display: none;
+  }
+} 
